@@ -12,13 +12,17 @@ using System.Threading.Tasks;
 
 namespace DownloaderWPF.Models
 {
+    /// <summary>
+    /// Contains the logic for downloading a video and gives information about the download progress and speed. 
+    /// </summary>
     static class Downloader
-    {
-        // public string Url { get; protected set; }
-        private static long downloadedBytes = 0;
+    {   
+        private static long totalDownloadedBytes = 0;
         private static long currentVideoSize = 0;
+        private static long bytesDownloadedPerSecond = 0;
 
         public static event EventHandler<ProgressUpdatedEventArgs> ProgressUpdated;
+        public static event EventHandler<SpeedUpdatedEventArgs> SpeedUpdated;
 
         private static void OnProgressUpdated(ProgressUpdatedEventArgs e)
         {
@@ -29,67 +33,35 @@ namespace DownloaderWPF.Models
             }
         }
 
-        public static void Download(VideoInfo video, string downloadLocation)
+        private static void OnSpeedUpdated(SpeedUpdatedEventArgs e)
         {
-            downloadedBytes = 0;
-            currentVideoSize = video.FileSize;
-
-            //ProgressUpdatedEventArgs e = new ProgressUpdatedEventArgs();
-            //foreach (Segment segment in video.Segments)
-            //{
-            //    DownloadSegmentAsync(video.DownloadUrl, downloadLocation, segment);
-            //    e.Progress = (int)(((double)Thread.VolatileRead(ref downloadedBytes) / currentVideoSize) * 100);
-            //    ProgressUpdated(typeof(Downloader), e);
-            //}
-
-
-            //ProgressUpdatedEventArgs e = new ProgressUpdatedEventArgs();
-            foreach (FileSegment[] segments in video.Segments)
+            EventHandler<SpeedUpdatedEventArgs> temp = Interlocked.CompareExchange(ref SpeedUpdated, null, null);
+            if (temp != null)
             {
-
-                Parallel.ForEach(segments, (segment) =>
-                //DownloadFile(video.DownloadUrl, downloadLocation, video.Segments);
-                //foreach (Segment segment in video.Segments)
-                {
-                    DownloadSegment(video.DownloadUrl, downloadLocation, segment);
-                });
-                Console.WriteLine();
+                SpeedUpdated(typeof(Downloader), e);
             }
         }
-        
-        private static void DownloadSegmentAsync(string videoUrl, string downloadLocation, FileSegment segment)
+
+        public static void Download(VideoInfo video, string downloadLocation, CancellationToken token)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(videoUrl);
-            request.AddRange(segment.Start, segment.End);
-            request.BeginGetResponse((result) =>
+            totalDownloadedBytes = 0;
+            currentVideoSize = video.FileSize;
+
+            int millisecondsInSecond = 1000;
+            int dueTime = 0;
+            using (Timer timer = new Timer(UpdateSpeed, null, dueTime, millisecondsInSecond))
+            {
+                FileStream stream = File.Create(downloadLocation);
+                stream.Dispose();
+                foreach (FileSegment[] segmentGroup in video.Segments)
                 {
-                    HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(result);
-                    
-                    using (Stream stream = response.GetResponseStream())
+                    Parallel.ForEach(segmentGroup, (segment) =>
                     {
-                        using (FileStream fileStream = File.Open(downloadLocation, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
-                        {
-                            fileStream.Position = segment.Start;
-                            using (BinaryReader reader = new BinaryReader(stream))
-                            {
-                                byte[] data = reader.ReadBytes((int)segment.Length);
-                                //Interlocked.Add(ref downloadedBytes, data.Length);
-                                using (BinaryWriter writer = new BinaryWriter(fileStream))
-                                {
-                                    writer.Write(data);
-
-                                    Interlocked.Add(ref downloadedBytes, data.Length);
-                                    ProgressUpdatedEventArgs e = new ProgressUpdatedEventArgs();
-                                    e.Progress = (int)(100.0 * downloadedBytes / currentVideoSize);
-                                    ProgressUpdated(typeof(Downloader), e);
-                                }
-
-                                //downloadedBytes += data.Length;
-                                
-                            }
-                        }
-                    }
-                }, request);
+                        token.ThrowIfCancellationRequested();
+                        DownloadSegment(video.DownloadUrl, downloadLocation, segment);
+                    });
+                }
+            }
         }
 
         private static void DownloadSegment(string videoUrl, string downloadLocation, FileSegment segment)
@@ -99,24 +71,39 @@ namespace DownloaderWPF.Models
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             using (Stream stream = response.GetResponseStream())
             {
-                using (FileStream fileStream = File.Open(downloadLocation, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                using (FileStream fileStream = File.Open(downloadLocation, FileMode.Open, FileAccess.Write, FileShare.ReadWrite))
                 {
                     fileStream.Position = segment.Start;
                     using (BinaryReader reader = new BinaryReader(stream))
                     {
                         byte[] data = reader.ReadBytes((int)segment.Length);
-                        Interlocked.Add(ref downloadedBytes, data.Length);
-                        ProgressUpdatedEventArgs e = new ProgressUpdatedEventArgs();
-                        e.Progress = (int)(100.0 * Thread.VolatileRead(ref downloadedBytes) / currentVideoSize);
-                        ProgressUpdated(typeof(Downloader), e);
+
+                        totalDownloadedBytes += data.Length;
+                        UpdateProgress();
+
                         using (BinaryWriter writer = new BinaryWriter(fileStream))
                         {
                             writer.Write(data);
+                            bytesDownloadedPerSecond += data.Length;
                         }
                     }
                 }
             }
             response.Close();
+        }
+
+        private static void UpdateSpeed(object obj)
+        {
+            SpeedUpdatedEventArgs speedArgs = new SpeedUpdatedEventArgs((bytesDownloadedPerSecond / 1024D / 1024D));
+            OnSpeedUpdated(speedArgs);
+            bytesDownloadedPerSecond = 0;
+        }
+
+        private static void UpdateProgress()
+        {
+            ProgressUpdatedEventArgs progressArgs = new ProgressUpdatedEventArgs();
+            progressArgs.Progress = (int)(100.0 * totalDownloadedBytes / currentVideoSize);
+            OnProgressUpdated(progressArgs);
         }
     }
 }

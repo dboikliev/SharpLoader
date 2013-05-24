@@ -22,11 +22,11 @@ namespace DownloaderWPF.Models
         public string DownloadUrl { get; protected set; }
         public string Url { get; protected set; }
         public long FileSize { get; protected set; }
-        public BitmapSource Thumbnail { get; protected set; }
+        public BitmapImage Thumbnail { get; protected set; }
 
 
         protected abstract string GetVideoDownloadUrl();
-        protected abstract BitmapSource GetVideoThumbnail();
+        protected abstract BitmapImage GetVideoThumbnail();
 
         protected VideoInfo(string videoUrl)
         {
@@ -73,9 +73,9 @@ namespace DownloaderWPF.Models
         }
 
 
-        protected long GetVideoLengthInBytes()
+        protected static long GetVideoLengthInBytes(string downloadUrl)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(this.DownloadUrl);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(downloadUrl);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             long contentLength = response.ContentLength;
             return contentLength;

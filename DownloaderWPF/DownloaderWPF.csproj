@@ -61,6 +61,7 @@
     <Compile Include="Models\Exceptions\DomainNotSupportedException.cs" />
     <Compile Include="Models\Exceptions\InvalidUrlException.cs" />
     <Compile Include="Models\FileSegment.cs" />
+    <Compile Include="Models\SpeedUpdatedEventArgs.cs" />
     <Compile Include="Models\Vbox7VideoInfo.cs" />
     <Compile Include="Models\VideoInfo.cs" />
     <Compile Include="Models\ProgressUpdatedEventArgs.cs" />

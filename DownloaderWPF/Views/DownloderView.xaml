@@ -17,9 +17,9 @@
                 BorderThickness="1"
                 Margin="10">
             <Image Height="165"
-                   Width="220"
+                   Width="217"
                    DockPanel.Dock="Left"
-                   Source="{Binding Thumbnail}">
+                   Source="{Binding Thumbnail, Mode=OneWay}">
             </Image>
         </Border>
         <StackPanel Orientation="Vertical">
@@ -36,8 +36,12 @@
                          Margin="10"
                          Minimum="0"
                          Maximum="100"
-                         
                          Value="{Binding Progress, Mode=OneWay}"/>
+            <TextBlock Width="100"
+                       HorizontalAlignment="Right"
+                       Margin="0 0 10 0"
+                       TextAlignment="Right"
+                       Text="{Binding Speed, Mode=OneWay}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

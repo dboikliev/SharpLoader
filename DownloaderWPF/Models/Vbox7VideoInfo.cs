@@ -1,16 +1,14 @@
 ﻿namespace DownloaderWPF.Models
 {
     using System;
-    using System.Collections.Generic;
-    using System.Drawing;
     using System.IO;
-    using System.Linq;
     using System.Net;
-    using System.Security.Policy;
-    using System.Text;
     using System.Text.RegularExpressions;
     using System.Windows.Media.Imaging;
     
+    /// <summary>
+    /// Holds the information about a video from Vbox7.
+    /// </summary>
     sealed class Vbox7VideoInfo : VideoInfo
     {
         private readonly string videoInfoUrl;
@@ -20,35 +18,39 @@
         public Vbox7VideoInfo(string videoUrl)
             : base(videoUrl)
         {
-            this.videoId = this.GetVideoId();
-            this.videoInfoUrl = this.GetVideoInfoUrl();
-            this.videoInfo = this.GetVideoInfo();
+            this.videoId = GetVideoId(videoUrl);
+            this.videoInfoUrl = GetVideoInfoUrl(this.videoId);
+            this.videoInfo = GetVideoInfo(this.videoInfoUrl);
 
             base.DownloadUrl = this.GetVideoDownloadUrl();
-            base.FileSize = base.GetVideoLengthInBytes();
+            base.FileSize = GetVideoLengthInBytes(base.DownloadUrl);
             base.Segments = FileSegment.SplitLengthIntoSegmentGroups(base.FileSize);
-
-            base.Thumbnail = GetVideoThumbnail();
+            base.Thumbnail = this.GetVideoThumbnail();
         }
 
-        private string GetVideoId()
+        private static string GetVideoId(string videoUrl)
         {
             string pattern = @"http://(www\.)?vbox7.com/play:(?<videoId>\w+)";
-            Match videoIdMatch = Regex.Match(base.Url, pattern);
+            Match videoIdMatch = Regex.Match(videoUrl, pattern);
             string videoId = videoIdMatch.Groups["videoId"].Captures[0].Value;
             return videoId;
         }
 
-        private string GetVideoInfoUrl()
+        private static string GetVideoInfoUrl(string videoId)
         {
             string url = string.Format("http://www.vbox7.com/etc/ext.do?key={0}", videoId);
             return url;
         }
 
-        private string GetVideoInfo()
+
+        /// <summary>
+        /// Downloads the information containing the links for the video file, the thumbnails etc.
+        /// </summary>
+        /// <param name="videoInfoUrl">The url where the video information is located.</param>
+        /// <returns>The text containing information about the video.</returns>
+        private static string GetVideoInfo(string videoInfoUrl)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(this.videoInfoUrl);
-            request.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100406 Firefox/3.5.3 (.NET CLR 4.0)";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(videoInfoUrl);
             request.AutomaticDecompression = DecompressionMethods.GZip;
             string responseContent = string.Empty;
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -63,6 +65,14 @@
             return responseContent;
         }
 
+        private static string GetThumbnailDownloadUrl(string videoInfo)
+        {
+            string thumbnailUrlPattern = @"i\d+.vbox7.com(/\w+)*(?<image_name>\w+\.jpg)";
+            Match match = Regex.Match(videoInfo, thumbnailUrlPattern);
+            string imageUrl = string.Format("http://{0}", match.Value);
+            return imageUrl;
+        }
+        
         protected override string GetVideoDownloadUrl()
         {
             string downloadUrlPattern = @"media\d+.vbox7.com/s/\w+/(?<filename>\w+\.\w{3})";
@@ -71,39 +81,21 @@
             return downloadUrl;
         }
 
-        private string GetThumbnailDownloadUrl()
+        protected override BitmapImage GetVideoThumbnail()
         {
-            string thumbnailUrlPattern = @"i\d+.vbox7.com(/\w+)*(?<image_name>\w+\.jpg)";
-            Match match = Regex.Match(this.videoInfo, thumbnailUrlPattern);
-            string imageUrl = string.Format("http://{0}", match.Value);
-            return imageUrl;
-        }
-
-        protected override BitmapSource GetVideoThumbnail()
-        {
-            string thumbnailUrl = this.GetThumbnailDownloadUrl();
+            string thumbnailUrl = GetThumbnailDownloadUrl(this.videoInfo);
             WebClient wc = new WebClient();
-            byte[] bytes = wc.DownloadData(thumbnailUrl);
-            MemoryStream ms = new MemoryStream(bytes);
-            ms.Position = 0;
-            Bitmap bitmap = new Bitmap(ms);
-            //WebClient wc = new WebClient();
-            //byte[] imageBytes = wc.DownloadData(thumbnailUrl);
-            //BitmapImage image = new BitmapImage();
-            //using (MemoryStream ms = new MemoryStream(imageBytes))
-            //{
-            //    image.BeginInit();
-            //    image.StreamSource = ms;
-            //    image.EndInit();
-            //}
-
-            var bitmapSource =
-               System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                 bitmap.GetHbitmap(Color.Black),
-                 IntPtr.Zero,
-                 new System.Windows.Int32Rect(0, 0, bitmap.Width, bitmap.Height),
-                 null);
-            return bitmapSource;
+            byte[] imageBytes = wc.DownloadData(thumbnailUrl);
+            BitmapImage image = new BitmapImage();
+            using (MemoryStream ms = new MemoryStream(imageBytes))
+            {
+                image.BeginInit();
+                image.StreamSource = ms;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.EndInit();
+            }
+            image.Freeze();
+            return image;
         }
     }
 }

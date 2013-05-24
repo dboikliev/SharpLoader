@@ -9,10 +9,7 @@ namespace DownloaderWPF.Models
     {
         public long Progress { get; set; }
 
-        public ProgressUpdatedEventArgs()
-        {
-            
-        }
+        public ProgressUpdatedEventArgs() { }
 
         public ProgressUpdatedEventArgs(int progress)
         {

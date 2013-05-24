@@ -10,8 +10,6 @@ C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoD
 C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\obj\Release\DownloaderWPF.csproj.GenerateResource.Cache
 C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\obj\Release\DownloaderWPF.exe
 C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\obj\Release\DownloaderWPF.pdb
-C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\bin\Release\MahApps.Metro.dll
-C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\bin\Release\System.Windows.Interactivity.dll
 C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\obj\Release\Views\DownloderView.g.cs
 C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\obj\Release\GeneratedInternalTypeHelper.g.cs
 C:\Users\Deyan\Documents\Visual Studio 2012\Projects\C#\Personal Projects\VideoDownloader\DownloaderWPF\obj\Release\DownloaderWPF_MarkupCompile.lref
