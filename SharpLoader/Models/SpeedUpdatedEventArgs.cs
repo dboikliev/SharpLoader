@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SharpLoader.Models
 {
@@ -19,7 +16,7 @@ namespace SharpLoader.Models
 
         public SpeedUpdatedEventArgs(double speed)
         {
-            this.Speed = speed;
+            Speed = speed;
         }
     }
 }

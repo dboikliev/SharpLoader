@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
 
 namespace SharpLoader.Commands
@@ -19,11 +16,11 @@ namespace SharpLoader.Commands
 
         public bool CanExecute(object parameter)
         {
-            if (this.canExecute == null)
+            if (canExecute == null)
             {
                 return true;
             }
-            return this.canExecute();
+            return canExecute();
         }
 
         public event EventHandler CanExecuteChanged
@@ -40,7 +37,7 @@ namespace SharpLoader.Commands
 
         public void Execute(object parameter)
         {
-            this.execute();
+            execute();
         }
     }
 }

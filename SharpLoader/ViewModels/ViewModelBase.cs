@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace SharpLoader.ViewModels
 {
@@ -14,7 +10,7 @@ namespace SharpLoader.ViewModels
         {
             if (PropertyChanged != null)
             {
-                PropertyChangedEventArgs eventArgs = new PropertyChangedEventArgs(propertyName);
+                var eventArgs = new PropertyChangedEventArgs(propertyName);
                 PropertyChanged(this, eventArgs);
             }
         }

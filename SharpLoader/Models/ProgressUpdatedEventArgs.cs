@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SharpLoader.Models
 {
@@ -13,7 +10,7 @@ namespace SharpLoader.Models
 
         public ProgressUpdatedEventArgs(int progress)
         {
-            this.Progress = progress;
+            Progress = progress;
         }
     }
 }

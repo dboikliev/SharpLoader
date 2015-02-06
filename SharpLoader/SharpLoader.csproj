@@ -60,11 +60,13 @@
     <Compile Include="Models\Downloader.cs" />
     <Compile Include="Models\Exceptions\DomainNotSupportedException.cs" />
     <Compile Include="Models\Exceptions\InvalidUrlException.cs" />
-    <Compile Include="Models\FileSegment.cs" />
+    <Compile Include="Models\VideoFileSegment.cs" />
     <Compile Include="Models\SpeedUpdatedEventArgs.cs" />
-    <Compile Include="Models\Vbox7VideoInfo.cs" />
-    <Compile Include="Models\VideoInfo.cs" />
     <Compile Include="Models\ProgressUpdatedEventArgs.cs" />
+    <Compile Include="Models\VideoFile.cs" />
+    <Compile Include="Models\VideoInfo\Vbox7VideoInfo.cs" />
+    <Compile Include="Models\VideoInfo\VideoInfoBase.cs" />
+    <Compile Include="Models\VideoInfo\YouTubeVideoInfo.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\ViewModelDownloader.cs" />
     <Compile Include="Views\DownloderView.xaml.cs">

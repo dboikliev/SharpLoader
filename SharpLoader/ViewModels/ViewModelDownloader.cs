@@ -1,19 +1,15 @@
-﻿using SharpLoader.Commands;
+﻿using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using SharpLoader.Commands;
 using SharpLoader.Models;
+using SharpLoader.Models.VideoInfo;
 
 namespace SharpLoader.ViewModels
 {
-    using SharpLoader.Commands;
-    using SharpLoader.Models;
-    using System;
-    using System.Net;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Forms;
-    using System.Windows.Input;
-    using System.Windows.Media.Imaging;
-
     class ViewModelDownloader : ViewModelBase
     {
         public ICommand DownloadCommand { get; private set; }
@@ -29,12 +25,12 @@ namespace SharpLoader.ViewModels
         {
             get
             {
-                return this.progress;
+                return progress;
             }
             set
             {
-                this.progress = value;
-                base.OnPropertyChanged("Progress");
+                progress = value;
+                OnPropertyChanged("Progress");
             }
         }
 
@@ -42,12 +38,12 @@ namespace SharpLoader.ViewModels
         {
             get
             {
-                return this.thumbnail;
+                return thumbnail;
             }
             set
             {
-                this.thumbnail = value;
-                base.OnPropertyChanged("Thumbnail");
+                thumbnail = value;
+                OnPropertyChanged("Thumbnail");
             }
         }
 
@@ -55,12 +51,12 @@ namespace SharpLoader.ViewModels
         {
             get
             {
-                return this.speed;
+                return speed;
             }
             set
             {
-                this.speed = string.Format("{0} MB/s", value);
-                base.OnPropertyChanged("Speed");
+                speed = string.Format("{0} MB/s", value);
+                OnPropertyChanged("Speed");
             }
         }
 
@@ -68,7 +64,7 @@ namespace SharpLoader.ViewModels
         public ViewModelDownloader()
         {
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;
-            this.DownloadCommand = new RelayCommandWithParameter<string>(Download, CanDownload);
+            DownloadCommand = new RelayCommandWithParameter<string>(Download, CanDownload);
             Downloader.ProgressUpdated += OnDownloaderProgressUpdated;
             Downloader.SpeedUpdated += OnSpeedUpdated;
         }
@@ -84,7 +80,7 @@ namespace SharpLoader.ViewModels
 
         private void Download(string videoUrl)
         {   
-            string downloadLocation = GetDownloadLocation();
+            var downloadLocation = GetDownloadLocation();
             if (!string.IsNullOrEmpty(downloadLocation))
             {
                 if (task != null && task.Status == TaskStatus.Running)
@@ -92,12 +88,13 @@ namespace SharpLoader.ViewModels
                     cancellationSource.Cancel();
                 }
                 cancellationSource = new CancellationTokenSource();
-                CancellationToken token = cancellationSource.Token;
+                var token = cancellationSource.Token;
+                var downloader = new Downloader();
                 task = new Task(() =>
                                    {
-                                       VideoInfo video = VideoInfo.LoadInfo(videoUrl);
-                                       this.Thumbnail = video.Thumbnail;
-                                       Downloader.Download(video, downloadLocation, token);
+                                       var video = VideoInfoBase.LoadInfo(videoUrl);
+                                       Thumbnail = video.Thumbnail;
+                                       downloader.DownloadFile(video, downloadLocation, token);
                                    }, token);
                 task.Start();
             }
@@ -105,7 +102,7 @@ namespace SharpLoader.ViewModels
 
         public string GetDownloadLocation()
         {
-            SaveFileDialog dialog = new SaveFileDialog();
+            var dialog = new SaveFileDialog();
             dialog.Filter = "Video File |*.flv";
             dialog.AddExtension = true;
             dialog.DefaultExt = ".flv";
@@ -115,12 +112,12 @@ namespace SharpLoader.ViewModels
 
         void OnDownloaderProgressUpdated(object sender, ProgressUpdatedEventArgs e)
         {
-            this.Progress = e.Progress;
+            Progress = e.Progress;
         }
 
         private void OnSpeedUpdated(object sender, SpeedUpdatedEventArgs e)
         {
-            this.Speed = e.Speed.ToString("0.00");
+            Speed = e.Speed.ToString("0.00");
         }
     }
 }

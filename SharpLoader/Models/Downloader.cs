@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Security.AccessControl;
-using System.Security.Permissions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SharpLoader.Models.VideoInfo;
 
 namespace SharpLoader.Models
 {
     /// <summary>
     /// Contains the logic for downloading a video and gives information about the download progress and speed. 
     /// </summary>
-    static class Downloader
-    {   
-        private static long totalDownloadedBytes = 0;
-        private static long currentVideoSize = 0;
-        private static long bytesDownloadedPerSecond = 0;
+    class Downloader
+    {
+        private long totalDownloadedBytes;
+        private long currentVideoSize;
+        private long bytesDownloadedPerSecond;
 
         public static event EventHandler<ProgressUpdatedEventArgs> ProgressUpdated;
         public static event EventHandler<SpeedUpdatedEventArgs> SpeedUpdated;
 
         private static void OnProgressUpdated(ProgressUpdatedEventArgs e)
         {
-            EventHandler<ProgressUpdatedEventArgs> temp = Interlocked.CompareExchange(ref ProgressUpdated, null, null);
+            var temp = Interlocked.CompareExchange(ref ProgressUpdated, null, null);
             if (temp != null)
             {
                 temp(typeof(Downloader), e);
@@ -35,27 +30,26 @@ namespace SharpLoader.Models
 
         private static void OnSpeedUpdated(SpeedUpdatedEventArgs e)
         {
-            EventHandler<SpeedUpdatedEventArgs> temp = Interlocked.CompareExchange(ref SpeedUpdated, null, null);
+            var temp = Interlocked.CompareExchange(ref SpeedUpdated, null, null);
             if (temp != null)
             {
                 SpeedUpdated(typeof(Downloader), e);
             }
         }
 
-        public static void Download(VideoInfo video, string downloadLocation, CancellationToken token)
+        public void DownloadFile(VideoInfoBase video, string downloadLocation, CancellationToken token)
         {
             totalDownloadedBytes = 0;
-            currentVideoSize = video.FileSize;
+            currentVideoSize = video.VideoSize;
 
-            int millisecondsInSecond = 1000;
-            int dueTime = 0;
-            using (Timer timer = new Timer(UpdateSpeed, null, dueTime, millisecondsInSecond))
+            const int millisecondsInSecond = 1000;
+            const int dueTime = 0;
+            using (var timer = new Timer(UpdateSpeed, null, dueTime, millisecondsInSecond))
             {
-                FileStream stream = File.Create(downloadLocation);
-                stream.Dispose();
-                foreach (FileSegment[] segmentGroup in video.Segments)
+                File.Create(downloadLocation).Dispose();
+                foreach (var segmentGroup in video.Segments)
                 {
-                    Parallel.ForEach(segmentGroup, (segment) =>
+                    Parallel.ForEach(segmentGroup, segment =>
                     {
                         token.ThrowIfCancellationRequested();
                         DownloadSegment(video.DownloadUrl, downloadLocation, segment);
@@ -64,44 +58,45 @@ namespace SharpLoader.Models
             }
         }
 
-        private static void DownloadSegment(string videoUrl, string downloadLocation, FileSegment segment)
+        private void DownloadSegment(string videoUrl, string downloadLocation, VideoFileSegment segment)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(videoUrl);
+            var request = (HttpWebRequest)WebRequest.Create(videoUrl);
             request.AddRange(segment.Start, segment.End);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            using (Stream stream = response.GetResponseStream())
+            using (var response = (HttpWebResponse)request.GetResponse())
             {
-                using (FileStream fileStream = File.Open(downloadLocation, FileMode.Open, FileAccess.Write, FileShare.ReadWrite))
+                using (var stream = response.GetResponseStream())
                 {
-                    fileStream.Position = segment.Start;
-                    using (BinaryReader reader = new BinaryReader(stream))
+                    using (var fileStream = File.Open(downloadLocation, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
                     {
-                        byte[] data = reader.ReadBytes((int)segment.Length);
-
-                        totalDownloadedBytes += data.Length;
-                        UpdateProgress();
-
-                        using (BinaryWriter writer = new BinaryWriter(fileStream))
+                        fileStream.Position = segment.Start;
+                        using (var reader = new BinaryReader(stream))
                         {
-                            writer.Write(data);
-                            bytesDownloadedPerSecond += data.Length;
+                            var data = reader.ReadBytes((int)segment.Length);
+
+                            totalDownloadedBytes += data.Length;
+                            UpdateProgress();
+
+                            using (var writer = new BinaryWriter(fileStream))
+                            {
+                                writer.Write(data);
+                                bytesDownloadedPerSecond += data.Length;
+                            }
                         }
                     }
                 }
             }
-            response.Close();
         }
 
-        private static void UpdateSpeed(object obj)
+        private void UpdateSpeed(object obj)
         {
-            SpeedUpdatedEventArgs speedArgs = new SpeedUpdatedEventArgs((bytesDownloadedPerSecond / 1024D / 1024D));
+            var speedArgs = new SpeedUpdatedEventArgs((bytesDownloadedPerSecond / 1024D / 1024D));
             OnSpeedUpdated(speedArgs);
             bytesDownloadedPerSecond = 0;
         }
 
-        private static void UpdateProgress()
+        private void UpdateProgress()
         {
-            ProgressUpdatedEventArgs progressArgs = new ProgressUpdatedEventArgs();
+            var progressArgs = new ProgressUpdatedEventArgs();
             progressArgs.Progress = (int)(100.0 * totalDownloadedBytes / currentVideoSize);
             OnProgressUpdated(progressArgs);
         }
