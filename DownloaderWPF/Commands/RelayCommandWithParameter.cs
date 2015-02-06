@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace DownloaderWPF.Commands
+namespace SharpLoader.Commands
 {
     class RelayCommandWithParameter<T> : ICommand
     {

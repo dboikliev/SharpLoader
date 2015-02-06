@@ -9,7 +9,7 @@ using System.Drawing;
 using VboxLoader.Models.Exceptions;
 using System.Windows.Media.Imaging;
 
-namespace DownloaderWPF.Models
+namespace SharpLoader.Models
 {
     abstract class VideoInfo
     {

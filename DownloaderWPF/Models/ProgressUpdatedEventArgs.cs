@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DownloaderWPF.Models
+namespace SharpLoader.Models
 {
     sealed class ProgressUpdatedEventArgs : EventArgs
     {

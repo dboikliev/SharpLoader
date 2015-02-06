@@ -1,4 +1,4 @@
-﻿namespace DownloaderWPF.Models
+﻿namespace SharpLoader.Models
 {
     using System;
     using System.Collections.Generic;

@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DownloaderWPF.Views
+namespace SharpLoader.Views
 {
     /// <summary>
     /// Interaction logic for Downloader.xaml

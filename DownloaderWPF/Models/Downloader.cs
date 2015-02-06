@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DownloaderWPF.Models
+namespace SharpLoader.Models
 {
     /// <summary>
     /// Contains the logic for downloading a video and gives information about the download progress and speed. 

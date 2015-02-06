@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
-namespace DownloaderWPF.ViewModels
+namespace SharpLoader.ViewModels
 {
     class ViewModelBase : INotifyPropertyChanged
     {

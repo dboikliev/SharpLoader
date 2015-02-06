@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DownloaderWPF
+namespace SharpLoader
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

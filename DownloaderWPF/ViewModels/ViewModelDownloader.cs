@@ -1,7 +1,10 @@
-﻿namespace DownloaderWPF.ViewModels
+﻿using SharpLoader.Commands;
+using SharpLoader.Models;
+
+namespace SharpLoader.ViewModels
 {
-    using DownloaderWPF.Commands;
-    using DownloaderWPF.Models;
+    using SharpLoader.Commands;
+    using SharpLoader.Models;
     using System;
     using System.Net;
     using System.Threading;
