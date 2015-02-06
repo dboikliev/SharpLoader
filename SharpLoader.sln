@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLoader", "DownloaderWPF\SharpLoader.csproj", "{085560FF-3DA0-4BC6-8FCA-3F62D478F1F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLoader", "SharpLoader\SharpLoader.csproj", "{085560FF-3DA0-4BC6-8FCA-3F62D478F1F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
