@@ -16,24 +16,15 @@ namespace SharpLoader.Models
         private long currentVideoSize;
         private long bytesDownloadedPerSecond;
 
-        public static event EventHandler<ProgressUpdatedEventArgs> ProgressUpdated;
-        public static event EventHandler<SpeedUpdatedEventArgs> SpeedUpdated;
+        public event EventHandler<ProgressUpdatedEventArgs> ProgressUpdated;
+        public event EventHandler<SpeedUpdatedEventArgs> SpeedUpdated;
 
-        private static void OnProgressUpdated(ProgressUpdatedEventArgs e)
+        private void RaiseEvent<T>(T args, ref EventHandler<T> eventHandler) where T : EventArgs
         {
-            var temp = Interlocked.CompareExchange(ref ProgressUpdated, null, null);
+            var temp = Interlocked.CompareExchange(ref eventHandler, null, null);
             if (temp != null)
             {
-                temp(typeof(Downloader), e);
-            }
-        }
-
-        private static void OnSpeedUpdated(SpeedUpdatedEventArgs e)
-        {
-            var temp = Interlocked.CompareExchange(ref SpeedUpdated, null, null);
-            if (temp != null)
-            {
-                SpeedUpdated(typeof(Downloader), e);
+                temp(this, args);
             }
         }
 
@@ -44,17 +35,22 @@ namespace SharpLoader.Models
 
             const int millisecondsInSecond = 1000;
             const int dueTime = 0;
-            using (var timer = new Timer(UpdateSpeed, null, dueTime, millisecondsInSecond))
+
+            using (new Timer((obj) => UpdateSpeed(), null, dueTime, millisecondsInSecond))
             {
-                File.Create(downloadLocation).Dispose();
-                foreach (var segmentGroup in video.Segments)
+                DownloadSegmentGroups(video, downloadLocation, token);
+            }
+        }
+
+        private void DownloadSegmentGroups(VideoInfoBase video, string downloadLocation, CancellationToken token)
+        {
+            foreach (var segmentGroup in VideoFileSegment.SplitLengthIntoSegmentGroups(video.VideoSize))
+            {
+                Parallel.ForEach(segmentGroup, segment =>
                 {
-                    Parallel.ForEach(segmentGroup, segment =>
-                    {
-                        token.ThrowIfCancellationRequested();
-                        DownloadSegment(video.DownloadUrl, downloadLocation, segment);
-                    });
-                }
+                    token.ThrowIfCancellationRequested();
+                    DownloadSegment(video.DownloadUrl, downloadLocation, segment);
+                });
             }
         }
 
@@ -66,7 +62,7 @@ namespace SharpLoader.Models
             {
                 using (var stream = response.GetResponseStream())
                 {
-                    using (var fileStream = File.Open(downloadLocation, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                    using (var fileStream = File.Open(downloadLocation, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
                     {
                         fileStream.Position = segment.Start;
                         using (var reader = new BinaryReader(stream))
@@ -87,10 +83,10 @@ namespace SharpLoader.Models
             }
         }
 
-        private void UpdateSpeed(object obj)
+        private void UpdateSpeed()
         {
             var speedArgs = new SpeedUpdatedEventArgs((bytesDownloadedPerSecond / 1024D / 1024D));
-            OnSpeedUpdated(speedArgs);
+            RaiseEvent(speedArgs, ref SpeedUpdated);
             bytesDownloadedPerSecond = 0;
         }
 
@@ -98,7 +94,7 @@ namespace SharpLoader.Models
         {
             var progressArgs = new ProgressUpdatedEventArgs();
             progressArgs.Progress = (int)(100.0 * totalDownloadedBytes / currentVideoSize);
-            OnProgressUpdated(progressArgs);
+            RaiseEvent(progressArgs, ref ProgressUpdated);
         }
     }
 }

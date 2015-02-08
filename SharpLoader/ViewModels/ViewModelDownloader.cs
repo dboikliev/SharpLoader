@@ -65,8 +65,6 @@ namespace SharpLoader.ViewModels
         {
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;
             DownloadCommand = new RelayCommandWithParameter<string>(Download, CanDownload);
-            Downloader.ProgressUpdated += OnDownloaderProgressUpdated;
-            Downloader.SpeedUpdated += OnSpeedUpdated;
         }
 
         private bool CanDownload(string obj)
@@ -90,6 +88,8 @@ namespace SharpLoader.ViewModels
                 cancellationSource = new CancellationTokenSource();
                 var token = cancellationSource.Token;
                 var downloader = new Downloader();
+                downloader.ProgressUpdated += OnDownloaderProgressUpdated;
+                downloader.SpeedUpdated += OnSpeedUpdated;
                 task = new Task(() =>
                                    {
                                        var video = VideoInfoBase.LoadInfo(videoUrl);

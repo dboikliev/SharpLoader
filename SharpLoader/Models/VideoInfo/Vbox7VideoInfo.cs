@@ -8,7 +8,7 @@ namespace SharpLoader.Models.VideoInfo
     /// <summary>
     /// Holds the information about a video from Vbox7.
     /// </summary>
-    sealed class Vbox7VideoInfo : VideoInfoBase
+    class Vbox7VideoInfo : VideoInfoBase
     {
         private readonly string videoInfoUrl;
         private readonly string videoInfo;
@@ -23,11 +23,11 @@ namespace SharpLoader.Models.VideoInfo
 
             DownloadUrl = GetVideoDownloadUrl();
             VideoSize = GetVideoLengthInBytes(DownloadUrl);
-            Segments = VideoFileSegment.SplitLengthIntoSegmentGroups(VideoSize);
             Thumbnail = GetVideoThumbnail();
+
         }
 
-        private static string GetVideoId(string videoUrl)
+        private string GetVideoId(string videoUrl)
         {
             const string pattern = @"http://(www\.)?vbox7.com/play:(?<videoId>\w+)";
             var videoIdMatch = Regex.Match(videoUrl, pattern);
@@ -35,7 +35,7 @@ namespace SharpLoader.Models.VideoInfo
             return videoId;
         }
 
-        private static string GetVideoInfoUrl(string videoId)
+        private string GetVideoInfoUrl(string videoId)
         {
             var url = string.Format("http://www.vbox7.com/etc/ext.do?key={0}", videoId);
             return url;
@@ -46,7 +46,7 @@ namespace SharpLoader.Models.VideoInfo
         /// </summary>
         /// <param name="videoInfoUrl">The url where the video information is located.</param>
         /// <returns>The text containing information about the video.</returns>
-        private static string GetVideoInfo(string videoInfoUrl)
+        private string GetVideoInfo(string videoInfoUrl)
         {
             var request = (HttpWebRequest)WebRequest.Create(videoInfoUrl);
             request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -63,14 +63,14 @@ namespace SharpLoader.Models.VideoInfo
             return responseContent;
         }
 
-        private static string GetThumbnailDownloadUrl(string videoInfo)
+        private string GetThumbnailDownloadUrl(string videoInfo)
         {
             var thumbnailUrlPattern = @"i\d+.vbox7.com(/\w+)*(?<image_name>\w+\.jpg)";
             var match = Regex.Match(videoInfo, thumbnailUrlPattern);
             var imageUrl = string.Format("http://{0}", match.Value);
             return imageUrl;
         }
-        
+
         protected override string GetVideoDownloadUrl()
         {
             var downloadUrlPattern = @"media\d+.vbox7.com/s/\w+/(?<filename>\w+\.\w{3})";
@@ -79,21 +79,11 @@ namespace SharpLoader.Models.VideoInfo
             return downloadUrl;
         }
 
-        protected override BitmapImage GetVideoThumbnail()
+        protected BitmapImage GetVideoThumbnail()
         {
             var thumbnailUrl = GetThumbnailDownloadUrl(videoInfo);
-            var wc = new WebClient();
-            var imageBytes = wc.DownloadData(thumbnailUrl);
-            var image = new BitmapImage();
-            using (var ms = new MemoryStream(imageBytes))
-            {
-                image.BeginInit();
-                image.StreamSource = ms;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.EndInit();
-            }
-            image.Freeze();
-            return image;
+            var thumbnail = base.GetVideoThumbnail(thumbnailUrl);
+            return thumbnail;
         }
     }
 }

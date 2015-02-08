@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
@@ -6,21 +6,37 @@ using VboxLoader.Models.Exceptions;
 
 namespace SharpLoader.Models.VideoInfo
 {
-    abstract class VideoInfoBase
+    public abstract class VideoInfoBase
     {
-        public IEnumerable<VideoFileSegment[]> Segments { get; protected set; }
         public string DownloadUrl { get; protected set; }
-        public string Url { get; protected set; }
+        public string VideoUrl { get; protected set; }
         public long VideoSize { get; protected set; }
         public BitmapImage Thumbnail { get; protected set; }
-
+        public string Title { get; protected set; }
 
         protected abstract string GetVideoDownloadUrl();
-        protected abstract BitmapImage GetVideoThumbnail();
+
+        protected BitmapImage GetVideoThumbnail(string thumbnailUrl)
+        {
+            using (var wc = new WebClient())
+            {
+                var imageBytes = wc.DownloadData(thumbnailUrl);
+                var image = new BitmapImage();
+                using (var ms = new MemoryStream(imageBytes))
+                {
+                    image.BeginInit();
+                    image.StreamSource = ms;
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.EndInit();
+                }
+                image.Freeze();
+                return image;
+            }
+        }
 
         protected VideoInfoBase(string videoUrl)
         {
-            Url = videoUrl;
+            VideoUrl = videoUrl;
         }
 
         public static VideoInfoBase LoadInfo(string videoUrl)
@@ -31,35 +47,28 @@ namespace SharpLoader.Models.VideoInfo
 
         private static VideoInfoBase CreateVideoInfo(string videoUrl)
         {
-            VideoInfoBase videoInfoBase = null;
             var domain = GetUrlDomain(videoUrl);
             switch (domain)
             {
                 case "vbox7.com":
-                    videoInfoBase = new Vbox7VideoInfo(videoUrl);
-                    break;
+                    return new Vbox7VideoInfo(videoUrl);
                 default:
                     throw new DomainNotSupportedException(domain);
             }
-            return videoInfoBase;
         }
 
         private static string GetUrlDomain(string videoUrl)
         {
-            var pattern = @"http://(www\.)?(?<domain>\w+\.\w{2,4})(/[\w;amp]*)*/?";
+            const string pattern = @"http://(www\.)?(?<domain>\w+\.\w{2,4})(/[\w;amp]*)*/?";
             var regex = new Regex(pattern);
             var match = regex.Match(videoUrl);
             var group = match.Groups["domain"];
-            var domain = string.Empty;
             if (group.Success)
             {
-                domain = group.Captures[0].Value;
+                string domain = group.Captures[0].Value;
+                return domain;
             }
-            else
-            {
-                throw new InvalidUrlException();
-            }
-            return domain;
+            throw new InvalidUrlException();
         }
 
 

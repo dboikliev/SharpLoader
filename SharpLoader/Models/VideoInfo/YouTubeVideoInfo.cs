@@ -14,10 +14,5 @@ namespace SharpLoader.Models.VideoInfo
         {
             throw new NotImplementedException();
         }
-
-        protected override BitmapImage GetVideoThumbnail()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
