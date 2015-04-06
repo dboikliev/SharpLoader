@@ -92,24 +92,21 @@
     <Compile Include="Models\Downloader\Range.cs" />
     <Compile Include="Models\Downloader\SpeedUpdatedEventArgs.cs" />
     <Compile Include="Models\Downloader\VideoFileSegmentGroup.cs" />
-    <Compile Include="Models\Video\IVideoInfo.cs" />
-    <Compile Include="Models\Video\Vbox7VideoInfoExtractor.cs" />
     <Compile Include="Models\Video\VideoInfo.cs" />
-    <Compile Include="Models\Video\YouTubeVideoInfoExtractor.cs" />
-    <Compile Include="Services\DialogService.cs" />
-    <Compile Include="Services\DownloaderService.cs" />
-    <Compile Include="Services\IDialogService.cs" />
-    <Compile Include="Services\IDownloaderService.cs" />
-    <Compile Include="Services\INotificationService.cs" />
-    <Compile Include="Services\IUrlService.cs" />
-    <Compile Include="Services\IVideoInfoService.cs" />
-    <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="Services\UrlService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Services\VideoInfoService.cs" />
+    <Compile Include="Services\Contracts\IDialogService.cs" />
+    <Compile Include="Services\Contracts\IDownloaderService.cs" />
+    <Compile Include="Services\Contracts\INotificationService.cs" />
+    <Compile Include="Services\Contracts\IUrlService.cs" />
+    <Compile Include="Services\Contracts\IVideoInfoService.cs" />
+    <Compile Include="Services\Implementations\DialogService.cs" />
+    <Compile Include="Services\Implementations\DownloaderService.cs" />
+    <Compile Include="Services\Implementations\NotificationService.cs" />
+    <Compile Include="Services\Implementations\UrlService.cs" />
+    <Compile Include="Services\Implementations\Vbox7VideoInfoService.cs" />
+    <Compile Include="Services\Implementations\VideoInfoService.cs" />
     <Compile Include="DependencyInjection\DependencyResolver.cs" />
     <Compile Include="DependencyInjection\IDependencyResolver.cs" />
+    <Compile Include="Services\Implementations\YouTubeVideoInfoExtractor.cs" />
     <Compile Include="ViewModels\AllDownloadsViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />

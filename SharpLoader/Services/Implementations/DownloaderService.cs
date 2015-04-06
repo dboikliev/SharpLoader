@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using SharpLoader.Constants;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Models.Video;
+using SharpLoader.Services.Contracts;
 
-namespace SharpLoader.Services
+namespace SharpLoader.Services.Implementations
 {
     /// <summary>
     /// Contains the logic for downloading a video and gives information about the download progress and speed. 

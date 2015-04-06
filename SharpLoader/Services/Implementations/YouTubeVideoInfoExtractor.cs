@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using SharpLoader.Models.Video;
+using SharpLoader.Services.Contracts;
 
-namespace SharpLoader.Models.Video
+namespace SharpLoader.Services.Implementations
 {
-    public class YouTubeVideoInfoExtractor : IVideoInfoExtractor
+    public class YouTubeVideoInfoService : IVideoInfoService
     {
         public async Task<VideoInfo> GetVideoInfo(string videoUrl)
         {

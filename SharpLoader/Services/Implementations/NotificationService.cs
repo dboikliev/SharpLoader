@@ -1,6 +1,7 @@
 ﻿using System.Windows;
+using SharpLoader.Services.Contracts;
 
-namespace SharpLoader.Services
+namespace SharpLoader.Services.Implementations
 {
     public class NotificationService : INotificationService
     {

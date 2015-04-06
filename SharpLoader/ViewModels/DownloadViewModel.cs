@@ -7,6 +7,7 @@ using SharpLoader.Models;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Services;
 using SharpLoader.DependencyInjection;
+using SharpLoader.Services.Contracts;
 
 namespace SharpLoader.ViewModels
 {

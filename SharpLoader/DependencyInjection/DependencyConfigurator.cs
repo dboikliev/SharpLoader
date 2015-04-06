@@ -1,5 +1,7 @@
 ﻿using SharpLoader.Services;
 using SharpLoader.DependencyInjection;
+using SharpLoader.Services.Contracts;
+using SharpLoader.Services.Implementations;
 
 namespace SharpLoader.DependencyInjection
 {

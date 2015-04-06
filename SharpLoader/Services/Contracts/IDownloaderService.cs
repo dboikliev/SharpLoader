@@ -2,7 +2,7 @@
 using SharpLoader.Models.Downloader;
 using SharpLoader.Models.Video;
 
-namespace SharpLoader.Services
+namespace SharpLoader.Services.Contracts
 {
     interface IDownloaderService
     {

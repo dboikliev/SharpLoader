@@ -1,4 +1,4 @@
-﻿namespace SharpLoader.Services
+﻿namespace SharpLoader.Services.Contracts
 {
     public interface INotificationService
     {

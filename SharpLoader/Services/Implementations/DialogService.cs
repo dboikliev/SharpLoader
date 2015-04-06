@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
+using SharpLoader.Services.Contracts;
 
-namespace SharpLoader.Services
+namespace SharpLoader.Services.Implementations
 {
     public class DialogService : IDialogService
     {
