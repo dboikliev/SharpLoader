@@ -15,7 +15,7 @@ namespace SharpLoader.Services
             VideoInfoExtractors = new Dictionary<string, IVideoInfoExtractor>
             {
                 { DomainsConstants.Vbox7, new Vbox7VideoInfoExtractor() },
-                { DomainsConstants.YouTube, null },
+                { DomainsConstants.YouTube, new YouTubeVideoInfoExtractor() },
                 { DomainsConstants.Vimeo, null },
                 { DomainsConstants.Pornhub, null },
                 { DomainsConstants.XVideos, null }
