@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace SharpLoader.Commands
 {
-    class RelayCommandWithParameter<T> : ICommand
+    public class RelayCommandWithParameter<T> : ICommand
     {
         private Action<T> execute;
         private Predicate<T> canExecute;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VboxLoader.Models.Exceptions
+namespace SharpLoader.Exceptions
 {
     class InvalidUrlException : Exception
     {

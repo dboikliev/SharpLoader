@@ -1,9 +1,10 @@
-﻿using SharpLoader.Models.VideoInfo;
+﻿using System.Threading.Tasks;
+using SharpLoader.Models.Video;
 
 namespace SharpLoader.Services
 {
     public interface IVideoInfoService
     {
-        VideoInfoBase GetVideoInfo(string videoUrl);
+        Task<VideoInfo> GetVideoInfo(string videoUrl);
     }
 }

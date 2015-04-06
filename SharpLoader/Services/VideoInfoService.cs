@@ -1,36 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using SharpLoader.Models.VideoInfo;
-using Domains = SharpLoader.Models.Constants.Domains;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using SharpLoader.Constants;
+using SharpLoader.DependencyInjection;
+using SharpLoader.Models.Video;
 
 namespace SharpLoader.Services
 {
     public class VideoInfoService : IVideoInfoService
     {
-        private readonly Dictionary<string, Func<string, VideoInfoBase>> videoInfoFactories;
+        private static readonly Dictionary<string, IVideoInfoExtractor> VideoInfoExtractors;
 
-        public VideoInfoService()
+        static VideoInfoService()
         {
-            videoInfoFactories = new Dictionary<string, Func<string, VideoInfoBase>>
+            VideoInfoExtractors = new Dictionary<string, IVideoInfoExtractor>
             {
-                { Domains.Vbox7, videoUrl => new Vbox7VideoInfo(videoUrl) },
-                { Domains.YouTube, videoUrl => new YouTubeVideoInfo(videoUrl) },
-                { Domains.Vimeo, videoUrl => { throw new NotImplementedException(); }},
-                { Domains.Pornhub, videoUrl => { throw new NotImplementedException(); }}
+                { DomainsConstants.Vbox7, new Vbox7VideoInfoExtractor() },
+                { DomainsConstants.YouTube, null },
+                { DomainsConstants.Vimeo, null },
+                { DomainsConstants.Pornhub, null },
+                { DomainsConstants.XVideos, null }
             };
         }
 
-        public VideoInfoBase GetVideoInfo(string videoUrl)
+        private readonly IUrlService urlService;
+
+        public VideoInfoService()
         {
-            var domain = GetDomainFromUrl(videoUrl);
-            var videoInfoFactory = videoInfoFactories[domain];
-            var videoInfo = videoInfoFactory(videoUrl);
-            return videoInfo;
+            urlService = DependencyResolver.Instance.Resolve<IUrlService>();
         }
 
-        private string GetDomainFromUrl(string url)
+        public async Task<VideoInfo> GetVideoInfo(string videoUrl)
         {
-            throw new NotImplementedException();
+            var domain = urlService.GetDomainFromUrl(videoUrl);
+            var videoInfoStrategy = VideoInfoExtractors[domain];
+            var videoInfo = await videoInfoStrategy.GetVideoInfo(videoUrl);
+            return  videoInfo;
         }
     }
 }

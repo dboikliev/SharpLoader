@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SharpLoader.Models
+namespace SharpLoader.Models.Downloader
 {
-    sealed class ProgressUpdatedEventArgs : EventArgs
+    public sealed class ProgressUpdatedEventArgs : EventArgs
     {
         public long Progress { get; set; }
 
