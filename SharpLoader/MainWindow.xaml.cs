@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows;
-using SharpLoader.ViewModels;
-using SharpLoader.Views;
+﻿using System.Windows;
 
 namespace SharpLoader
 {

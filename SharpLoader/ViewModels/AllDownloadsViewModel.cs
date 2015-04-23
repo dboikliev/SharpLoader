@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using SharpLoader.Commands;
-using SharpLoader.Services;
 using SharpLoader.DependencyInjection;
 using SharpLoader.Services.Contracts;
 

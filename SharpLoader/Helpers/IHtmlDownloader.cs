@@ -1,7 +1,9 @@
-﻿namespace SharpLoader.Helpers
+﻿using System.Threading.Tasks;
+
+namespace SharpLoader.Helpers
 {
-    internal interface IHtmlDownloader
+    public interface IHtmlDownloader
     {
-        string DownloadHtml(string url);
+        Task<string> DownloadHtmlAsync(string url);
     }
 }

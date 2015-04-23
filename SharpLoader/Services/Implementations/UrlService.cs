@@ -6,7 +6,7 @@ namespace SharpLoader.Services.Implementations
 {
     public class UrlService : IUrlService
     {
-        private const string UrlPattern = @"http://(www\.)?(?<domain>\w+\.\w{2,4})(/[\w&\d:]*)*/?";
+        private const string UrlPattern = @"https?://(www\.)?(?<domain>\w+\.\w{2,4})(/[\w&\d:]*)*/?";
 
         public bool IsValidUrl(string videoUrl)
         {

@@ -1,10 +1,17 @@
-﻿namespace SharpLoader.Helpers
+﻿using System.Net;
+using System.Threading.Tasks;
+
+namespace SharpLoader.Helpers
 {
     public class HtmlDownloader : IHtmlDownloader
     {
-        public string DownloadHtml(string url)
+        public async Task<string> DownloadHtmlAsync(string url)
         {
-            throw new System.NotImplementedException();
+            using (var webClient = new WebClient())
+            {
+                var html = await webClient.DownloadStringTaskAsync(url);
+                return html;
+            }
         }
     }
 }

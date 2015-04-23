@@ -1,5 +1,4 @@
-﻿using SharpLoader.Services;
-using SharpLoader.DependencyInjection;
+﻿using SharpLoader.Helpers;
 using SharpLoader.Services.Contracts;
 using SharpLoader.Services.Implementations;
 
@@ -23,6 +22,8 @@ namespace SharpLoader.DependencyInjection
             DependencyResolver.Instance.RegisterType<IDialogService, DialogService>();
             DependencyResolver.Instance.RegisterType<IDownloaderService, DownloaderService>();
             DependencyResolver.Instance.RegisterType<INotificationService, NotificationService>();
+            DependencyResolver.Instance.RegisterType<IHtmlDownloader, HtmlDownloader>();
+            DependencyResolver.Instance.RegisterType<IHtmlParser, HtmlParser>();
         }
     }
 }
