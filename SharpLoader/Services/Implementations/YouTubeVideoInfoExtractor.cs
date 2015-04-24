@@ -5,10 +5,13 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Management;
+using System.Windows.Media.Imaging;
 using SharpLoader.DependencyInjection;
 using SharpLoader.Helpers;
 using SharpLoader.Models.Video;
 using SharpLoader.Services.Contracts;
+using System.IO;
 
 namespace SharpLoader.Services.Implementations
 {
@@ -24,23 +27,77 @@ namespace SharpLoader.Services.Implementations
         public async Task<VideoInfo> GetVideoInfo(string videoUrl)
         {
             var videoId = ExtractVideoId(videoUrl);
-            var urls = await GetDownloadUrls(videoId);
+            var metadata = await GetVideoMetadata(videoId);
+            var urls = ExtractDownloadUrls(metadata);
+            var duration = ExtractDurationInSeconds(metadata);
+            var thumbnailUrl = ExtractThumbnailUrl(metadata);
+            var thumbnail = GetThumbnail(thumbnailUrl);
+            var title = ExtractVideoTitle(metadata);
+
             var url = urls.First();
             var size = GetVideoSizeInBytes(url);
             var videoInfo = new VideoInfo
             {
                 VideoUrl = videoUrl,
                 FileSize = size,
-                DownloadUrl = url
+                DownloadUrl = url,
+                DuationInSeconds = duration,
+                Thumbnail = thumbnail,
+                Title = title
             };
             return videoInfo;
         }
 
-        private async Task<IEnumerable<string>> GetDownloadUrls(string videoId)
+        private string ExtractVideoTitle(string metadata)
+        {
+            var title = HttpUtility.ParseQueryString(metadata)["title"];
+            return title;
+        }
+
+        private string ExtractThumbnailUrl(string metadata)
+        {
+            var thumbnailUrl = HttpUtility.ParseQueryString(metadata)["thumbnail_url"];
+            return thumbnailUrl;
+        }
+
+        private BitmapImage GetThumbnail(string thumbnailUrl)
+        {
+            using (var webClient = new WebClient())
+            {
+                var data = webClient.DownloadData(thumbnailUrl);
+                var bitmap = new BitmapImage();
+                using (var dataStream = new MemoryStream(data))
+                {
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = dataStream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                }
+                bitmap.Freeze();
+                return bitmap;
+            }
+
+        }
+
+        private int ExtractDurationInSeconds(string metadata)
+        {
+            var duration = int.Parse(HttpUtility.ParseQueryString(metadata)["length_seconds"]);
+            return duration;
+        }
+
+        private async Task<string> GetVideoMetadata(string videoId)
         {
             var metadataUrl = string.Format("http://www.youtube.com/get_video_info?video_id={0}&el=detailpage", videoId);
-            var html = await new WebClient().DownloadStringTaskAsync(metadataUrl);
-            var urlEncodedStreamMap = HttpUtility.ParseQueryString(html)["url_encoded_fmt_stream_map"];
+            using (var webClient = new WebClient())
+            {
+                var metadata = await webClient.DownloadStringTaskAsync(metadataUrl);
+                return metadata;
+            }
+        }
+
+        private IEnumerable<string> ExtractDownloadUrls(string metadata)
+        {
+            var urlEncodedStreamMap = HttpUtility.ParseQueryString(metadata)["url_encoded_fmt_stream_map"];
             var urls = ParseUrlEncodedStreamMap(urlEncodedStreamMap);
             return urls;
         }
