@@ -6,17 +6,11 @@
              mc:Ignorable="d">
     <Grid Name="MainGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Name="FirstColumn" Width="170"/>
+            <ColumnDefinition Name="FirstColumn" Width="Auto"/>
             <ColumnDefinition Width="*" MinWidth="200"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
         <Border Grid.Column="0"
                 Grid.Row="0"
-                Grid.RowSpan="3"
                 VerticalAlignment="Top"
                 BorderBrush="#CCC"
                 BorderThickness="1"
@@ -27,29 +21,40 @@
                    Height="150"
                    Source="{Binding Thumbnail, Mode=OneWay}"/>
         </Border>
-        <TextBlock Grid.Column="1"
-                   Grid.Row="1"
-                   VerticalAlignment="Center"
-            Text="{Binding Title, Mode=OneWay}"/>
-        <ProgressBar Grid.Column="1" 
-                     Grid.Row="0"
+        <StackPanel Grid.Column="1"
+                    Grid.Row="0"
+                    Margin="10"
+                    HorizontalAlignment="Stretch">
+            <TextBlock Height="20" Text="{Binding Title, Mode=OneWay}"/>
+            <ProgressBar 
                      Height="20"
                      Minimum="0"
                      Maximum="100"
-                     Margin="0, -5, 5, 0"
                      Value="{Binding Progress, Mode=OneWay}"/>
-        <StackPanel Grid.Column="1"
-                   Grid.Row="2" Orientation="Horizontal">
-            <TextBlock
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
                    TextAlignment="Left"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Center"
                    Margin="0, 0, 10, 0"
                    Text="Speed:"/>
-            <TextBlock VerticalAlignment="Center"
+                <TextBlock VerticalAlignment="Center"
                    HorizontalAlignment="Left"
                    TextAlignment="Left"
                    Text="{Binding Speed, Mode=OneWay}"></TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                   TextAlignment="Left"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   Margin="0, 0, 10, 0"
+                   Text="Duration:"/>
+                <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Left"
+                   TextAlignment="Left"
+                   Text="{Binding Duration, Mode=OneWay}"></TextBlock>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -7,6 +10,7 @@ using SharpLoader.Models;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Services;
 using SharpLoader.DependencyInjection;
+using SharpLoader.Models.Video;
 using SharpLoader.Services.Contracts;
 
 namespace SharpLoader.ViewModels
@@ -17,6 +21,7 @@ namespace SharpLoader.ViewModels
         private BitmapImage thumbnail;
         private string speed;
         private string title;
+        private string duration;
 
         public string Title
         {
@@ -54,6 +59,16 @@ namespace SharpLoader.ViewModels
             }
         }
 
+        public string Duration
+        {
+            get { return duration; }
+            set
+            {
+                duration = value;
+                OnPropertyChanged("Duration");
+            }
+        }
+
         public string Speed
         {
             get
@@ -81,12 +96,17 @@ namespace SharpLoader.ViewModels
             downloaderService.SpeedUpdated += OnSpeedUpdated;
         }
 
-        public async void Download(string videoUrl, string downloadLocation)
+        public async Task<VideoInfo> Initialize(string videoUrl)
         {
             var videoInfo = await videoInfoService.GetVideoInfo(videoUrl);
             Thumbnail = videoInfo.Thumbnail;
             Title = videoInfo.Title;
+            Duration = TimeSpan.FromSeconds(videoInfo.DurationInSeconds).ToString();
+            return videoInfo;
+        }
 
+        public void Download(VideoInfo videoInfo, string downloadLocation)
+        {
             downloaderService.BeginDownload(videoInfo, downloadLocation);
         }
 

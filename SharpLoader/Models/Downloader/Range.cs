@@ -43,7 +43,6 @@ namespace SharpLoader.Models.Downloader
 
         public static IEnumerable<Range> SplitLengthIntoRanges(long lengthToSplit, long rangeLength)
         {
-            var ranges = new List<Range>();
             var remaining = lengthToSplit;
             var currentPosition = 0L;
             while (remaining > 0)
@@ -51,11 +50,10 @@ namespace SharpLoader.Models.Downloader
                 var rangeStart = currentPosition;
                 var rangeEnd = Math.Min(currentPosition + rangeLength, lengthToSplit);
                 var range = new Range(rangeStart, rangeEnd);
-                ranges.Add(range);
+                yield return range;
                 remaining -= rangeLength;
                 currentPosition += range.Length;
             }
-            return ranges;
         }
     }
 }

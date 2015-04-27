@@ -41,7 +41,7 @@ namespace SharpLoader.Services.Implementations
                 VideoUrl = videoUrl,
                 FileSize = size,
                 DownloadUrl = url,
-                DuationInSeconds = duration,
+                DurationInSeconds = duration,
                 Thumbnail = thumbnail,
                 Title = title
             };
@@ -130,13 +130,20 @@ namespace SharpLoader.Services.Implementations
         private string DecipherSignature(string signature)
         {
             var signatureChars = signature.ToCharArray();
+            signatureChars = SwapSigunatureCharacters(signatureChars, 13);
+            signatureChars = Slice(signatureChars, 1);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 4);
+            signatureChars = Slice(signatureChars, 2);
             Array.Reverse(signatureChars);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 41);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 65);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 11);
-            Array.Reverse(signatureChars);
+            signatureChars = Slice(signatureChars, 2);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 25);
             var decipheredSignature = string.Concat(signatureChars);
             return decipheredSignature;
+        }
+
+        private char[] Slice(char[] characters, int position)
+        {
+            return characters.Skip(position).Take(characters.Length).ToArray();
         }
 
         private char[] SwapSigunatureCharacters(char[] signatureCharacters, int position)

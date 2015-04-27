@@ -19,14 +19,14 @@ namespace SharpLoader.ViewModels
         {
             Downloads = new ObservableCollection<DownloadViewModel>();
 
-            BeginDownload = new RelayCommandWithParameter<string>(InitializeDownload, CanInitializeDownload);
-
+            BeginDownload = new CommandWithParameter<string>(InitializeDownload, CanInitializeDownload);
+            
             dialogService = DependencyResolver.Instance.Resolve<IDialogService>();
             urlService = DependencyResolver.Instance.Resolve<IUrlService>();
             notificationService = DependencyResolver.Instance.Resolve<INotificationService>();
         }
 
-        private void InitializeDownload(string videoUrl)
+        private async void InitializeDownload(string videoUrl)
         {
             if (!ValidateUrl(videoUrl))
             {
@@ -41,7 +41,8 @@ namespace SharpLoader.ViewModels
 
             var downloader = new DownloadViewModel();
             Downloads.Add(downloader);
-            downloader.Download(videoUrl, downloadLocation);
+            var videoInfo = await downloader.Initialize(videoUrl);
+            downloader.Download(videoInfo, downloadLocation);
         }
 
         private bool ValidateUrl(string videoUrl)

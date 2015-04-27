@@ -68,8 +68,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Commands\RelayCommand.cs" />
-    <Compile Include="Commands\RelayCommandWithParameter.cs" />
+    <Compile Include="Commands\CompositeCommand.cs" />
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandWithParameter.cs" />
     <Compile Include="Constants\DomainsConstants.cs" />
     <Compile Include="Constants\DownloaderContants.cs" />
     <Compile Include="DependencyInjection\DependencyConfigurator.cs" />

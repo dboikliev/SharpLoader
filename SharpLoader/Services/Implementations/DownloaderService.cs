@@ -58,14 +58,8 @@ namespace SharpLoader.Services.Implementations
         private void DownloadSegmentGroups(VideoInfo video, string downloadLocation)
         {
             var segments = Range.SplitLengthIntoRanges(video.FileSize, DownloaderContants.SegmentSizeInBytes).ToArray();
-            var rangesPerGroup = Environment.ProcessorCount;
-            var step = rangesPerGroup;
-            for (var start = 0; start < segments.Length; start += step)
-            {
-                var take = Math.Min(step, segments.Length - start);
-                var rangeGroup = Enumerable.Range(start, take).Select(x => segments[x]);
-                Parallel.ForEach(rangeGroup, range => DownloadRange(video.DownloadUrl, downloadLocation, range));
-            }
+            var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+            Parallel.ForEach(segments, options, range => DownloadRange(video.DownloadUrl, downloadLocation, range));
         }
 
         private void DownloadRange(string videoUrl, string downloadLocation, Range segment)
@@ -96,7 +90,7 @@ namespace SharpLoader.Services.Implementations
 
         private void UpdateSpeed()
         {
-            var megabytes = bytesDownloadedPerSecond / 1024D / 1024D;
+            var megabytes = bytesDownloadedPerSecond / 1024.0 / 1024.0;
             var speedArgs = new SpeedUpdatedEventArgs(megabytes);
             RaiseEvent(speedArgs, ref SpeedUpdated);
             bytesDownloadedPerSecond = 0;
@@ -104,8 +98,10 @@ namespace SharpLoader.Services.Implementations
 
         private void UpdateProgress()
         {
-            var progressArgs = new ProgressUpdatedEventArgs();
-            progressArgs.Progress = (int)(100.0 * totalDownloadedBytes / currentVideoSize);
+            var progressArgs = new ProgressUpdatedEventArgs
+            {
+                Progress = (int) (100.0 * totalDownloadedBytes / currentVideoSize)
+            };
             RaiseEvent(progressArgs, ref ProgressUpdated);
         }
     }
