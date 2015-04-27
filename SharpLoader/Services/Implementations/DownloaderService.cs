@@ -49,13 +49,13 @@ namespace SharpLoader.Services.Implementations
             const int millisecondsInSecond = 1000;
             const int dueTime = 0;
 
-            using (new Timer((obj) => UpdateSpeed(), null, dueTime, millisecondsInSecond))
+            using (new Timer(_ => UpdateSpeed(), null, dueTime, millisecondsInSecond))
             {
-                DownloadSegmentGroups(video, downloadLocation);
+                DownloadRanges(video, downloadLocation);
             }
         }
 
-        private void DownloadSegmentGroups(VideoInfo video, string downloadLocation)
+        private void DownloadRanges(VideoInfo video, string downloadLocation)
         {
             var segments = Range.SplitLengthIntoRanges(video.FileSize, DownloaderContants.SegmentSizeInBytes);
             var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
