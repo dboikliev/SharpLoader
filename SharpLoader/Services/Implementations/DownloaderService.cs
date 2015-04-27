@@ -25,10 +25,10 @@ namespace SharpLoader.Services.Implementations
 
         private void RaiseEvent<T>(T args, ref EventHandler<T> eventHandler) where T : EventArgs
         {
-            var temp = Interlocked.CompareExchange(ref eventHandler, null, null);
-            if (temp != null)
+            var handler = Interlocked.CompareExchange(ref eventHandler, null, null);
+            if (handler != null)
             {
-                temp(this, args);
+                handler(this, args);
             }
         }
 
@@ -57,9 +57,16 @@ namespace SharpLoader.Services.Implementations
 
         private void DownloadSegmentGroups(VideoInfo video, string downloadLocation)
         {
-            var segments = Range.SplitLengthIntoRanges(video.FileSize, DownloaderContants.SegmentSizeInBytes).ToArray();
+            var segments = Range.SplitLengthIntoRanges(video.FileSize, DownloaderContants.SegmentSizeInBytes);
             var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+            CreateCleanFile(downloadLocation);
             Parallel.ForEach(segments, options, range => DownloadRange(video.DownloadUrl, downloadLocation, range));
+        }
+
+        private void CreateCleanFile(string downloadLocation)
+        {
+            var stream = File.Create(downloadLocation);
+            stream.Dispose();
         }
 
         private void DownloadRange(string videoUrl, string downloadLocation, Range segment)
@@ -69,7 +76,7 @@ namespace SharpLoader.Services.Implementations
 
             using (var response = (HttpWebResponse)request.GetResponse())
             using (var stream = response.GetResponseStream())
-            using (var fileStream = File.Open(downloadLocation, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
+            using (var fileStream = File.Open(downloadLocation, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 fileStream.Position = segment.Start;
                 using (var reader = new BinaryReader(stream))
