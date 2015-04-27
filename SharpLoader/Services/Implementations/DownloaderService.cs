@@ -57,10 +57,10 @@ namespace SharpLoader.Services.Implementations
 
         private void DownloadRanges(VideoInfo video, string downloadLocation)
         {
-            var segments = Range.SplitLengthIntoRanges(video.FileSize, DownloaderContants.SegmentSizeInBytes);
+            var ranges = Range.SplitLengthIntoRanges(video.FileSize, DownloaderContants.SegmentSizeInBytes);
             var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
             CreateCleanFile(downloadLocation);
-            Parallel.ForEach(segments, options, range => DownloadRange(video.DownloadUrl, downloadLocation, range));
+            Parallel.ForEach(ranges, options, range => DownloadRange(video.DownloadUrl, downloadLocation, range));
         }
 
         private void CreateCleanFile(string downloadLocation)
