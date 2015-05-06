@@ -130,13 +130,14 @@ namespace SharpLoader.Services.Implementations
         private string DecipherSignature(string signature)
         {
             var signatureChars = signature.ToCharArray();
-            signatureChars = SwapSigunatureCharacters(signatureChars, 13);
-            signatureChars = Slice(signatureChars, 1);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 4);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 52);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 25);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 62);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 51);
+            signatureChars = SwapSigunatureCharacters(signatureChars, 2);
             signatureChars = Slice(signatureChars, 2);
             Array.Reverse(signatureChars);
-            signatureChars = Slice(signatureChars, 2);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 25);
+            signatureChars = Slice(signatureChars, 1);
             var decipheredSignature = string.Concat(signatureChars);
             return decipheredSignature;
         }
