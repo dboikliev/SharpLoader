@@ -10,16 +10,17 @@ namespace SharpLoader.Services.Implementations
 {
     public class Vbox7VideoInfoService : IVideoInfoService
     {
-        public async Task<VideoInfo> GetVideoInfo(string videoUrl)
+        public VideoInfo GetVideoInfo(string videoUrl)
         {
             var videoId = ExtractVideoId(videoUrl);
             var metadataUrl = ExtractMetadataPageUrl(videoId);
-            var metadata = await GetMetadata(metadataUrl);
+            var metadata = GetMetadata(metadataUrl);
             var downloadUrl = ExtractVideoDownloadUrl(metadata);
             var thumnailUrl = ExtractThumbnailUrl(metadata);
-            var thumbnail = await GetVideoThumbnail(thumnailUrl);
+            var thumbnail = GetVideoThumbnail(thumnailUrl);
             var size = GetVideoSizeInBytes(downloadUrl);
             var title = ExtractVideoTitle(metadata);
+            
 
             var info = new VideoInfo
             {
@@ -27,7 +28,7 @@ namespace SharpLoader.Services.Implementations
                 Thumbnail = thumbnail,
                 Title = title,
                 FileSize = size,
-                VideoUrl = videoUrl
+                VideoUrl = videoUrl,
             };
             return info;
         }
@@ -43,11 +44,11 @@ namespace SharpLoader.Services.Implementations
             return decodedTitle;
         }
 
-        private async Task<BitmapImage> GetVideoThumbnail(string thumbnailUrl)
+        private BitmapImage GetVideoThumbnail(string thumbnailUrl)
         {
             using (var webClient = new WebClient())
             {
-                var imageBytes = await webClient.DownloadDataTaskAsync(thumbnailUrl);
+                var imageBytes =  webClient.DownloadData(thumbnailUrl);
                 var image = new BitmapImage();
                 using (var ms = new MemoryStream(imageBytes))
                 {
@@ -85,12 +86,12 @@ namespace SharpLoader.Services.Implementations
             return downloadUrl;
         }
 
-        private async Task<string> GetMetadata(string metadataUrl)
+        private string GetMetadata(string metadataUrl)
         {
             var request = (HttpWebRequest)WebRequest.Create(metadataUrl);
             request.AutomaticDecompression = DecompressionMethods.GZip;
             
-            using (var response = await request.GetResponseAsync())
+            using (var response = request.GetResponse())
             {
                 using (var stream = response.GetResponseStream())
                 {

@@ -8,6 +8,7 @@ using SharpLoader.Constants;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Models.Video;
 using SharpLoader.Services.Contracts;
+using SharpLoader.Utils;
 
 namespace SharpLoader.Services.Implementations
 {
@@ -22,23 +23,17 @@ namespace SharpLoader.Services.Implementations
 
         public event EventHandler<ProgressUpdatedEventArgs> ProgressUpdated;
         public event EventHandler<SpeedUpdatedEventArgs> SpeedUpdated;
-
-        private void RaiseEvent<T>(T args, ref EventHandler<T> eventHandler) where T : EventArgs
-        {
-            var handler = Interlocked.CompareExchange(ref eventHandler, null, null);
-            if (handler != null)
-            {
-                handler(this, args);
-            }
-        }
+        public event EventHandler<DownloadFinishedEventArgs> DownloadFinished;
 
         public void BeginDownload(VideoInfo videoInfo, string downloadLocation)
         {
-            var task = new Task(() =>
+            Task.Factory.StartNew(() =>
             {
                 DownloadFile(videoInfo, downloadLocation);
+                bytesDownloadedPerSecond = 0;
+                UpdateSpeed();
+                EventUtils.RaiseEvent(this, new DownloadFinishedEventArgs(downloadLocation), ref DownloadFinished);
             });
-            task.Start();
         }
 
         private void DownloadFile(VideoInfo video, string downloadLocation)
@@ -99,7 +94,7 @@ namespace SharpLoader.Services.Implementations
         {
             var megabytes = bytesDownloadedPerSecond / 1024.0 / 1024.0;
             var speedArgs = new SpeedUpdatedEventArgs(megabytes);
-            RaiseEvent(speedArgs, ref SpeedUpdated);
+            EventUtils.RaiseEvent(this, speedArgs, ref SpeedUpdated);
             bytesDownloadedPerSecond = 0;
         }
 
@@ -109,7 +104,7 @@ namespace SharpLoader.Services.Implementations
             {
                 Progress = (int) (100.0 * totalDownloadedBytes / currentVideoSize)
             };
-            RaiseEvent(progressArgs, ref ProgressUpdated);
+            EventUtils.RaiseEvent(this, progressArgs, ref ProgressUpdated);
         }
     }
 }

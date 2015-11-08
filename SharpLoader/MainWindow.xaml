@@ -8,16 +8,47 @@
         WindowStyle="SingleBorderWindow"
         SnapsToDevicePixels="True"
         Background="White"
+        Width="600"
+        Height="350"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary Source="MainWindowResources.xaml" />
     </Window.Resources>
-     <StackPanel>
-         <StackPanel.DataContext>
-             <vm:AllDownloadsViewModel/>
-         </StackPanel.DataContext>
-        <TextBox Name="TextBoxUrl"/>
-        <Button CommandParameter="{Binding ElementName=TextBoxUrl, Path=Text}" Command="{Binding BeginDownload}" Content="Add"/>
-        <ListView ItemsSource="{Binding Downloads}"/>
-    </StackPanel>
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+    <TabControl>
+        <TabItem Header="Downloading" ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <!--<Grid.DataContext>
+                    <vm:AllDownloadsViewModel/>
+                </Grid.DataContext>-->
+                <DockPanel Grid.Row="0">
+                    <Button DockPanel.Dock="Right" CommandParameter="{Binding ElementName=TextBoxUrl, Path=Text}" Command="{Binding BeginDownload}" Content="Download"/>
+                    <TextBox VerticalContentAlignment="Center" 
+                             DockPanel.Dock="Left" 
+                             Name="TextBoxUrl"/>
+                </DockPanel>
+                <ListView Grid.Row="1"
+                          ScrollViewer.CanContentScroll="False"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"  
+                          HorizontalContentAlignment="Stretch" 
+                          BorderThickness="0"
+                          ItemsSource="{Binding AllDownloads.Downloads}"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Converting">
+            <ListView ScrollViewer.CanContentScroll="False"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"  
+                      HorizontalContentAlignment="Stretch" 
+                      BorderThickness="0" 
+                      ItemsSource="{Binding AllConverting.Converting}">
+            </ListView>
+        </TabItem>
+        <TabItem Header="Settings"></TabItem>
+    </TabControl>
 </Window>

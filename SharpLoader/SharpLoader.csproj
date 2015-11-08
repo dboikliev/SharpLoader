@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>sharploadericon_OxC_icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Practices.Unity">
       <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
@@ -45,6 +48,10 @@
     </Reference>
     <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention">
       <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -73,6 +80,7 @@
     <Compile Include="Commands\CommandWithParameter.cs" />
     <Compile Include="Constants\DomainsConstants.cs" />
     <Compile Include="Constants\DownloaderContants.cs" />
+    <Compile Include="Constants\MimeTypes.cs" />
     <Compile Include="DependencyInjection\DependencyConfigurator.cs" />
     <Compile Include="DependencyInjection\IDependencyConfigurator.cs" />
     <Compile Include="Exceptions\DomainNotSupportedException.cs" />
@@ -81,6 +89,7 @@
     <Compile Include="Helpers\HtmlParser.cs" />
     <Compile Include="Helpers\IHtmlDownloader.cs" />
     <Compile Include="Helpers\IHtmlParser.cs" />
+    <Compile Include="Models\Downloader\DownloadFinishedEventArgs.cs" />
     <Compile Include="Models\Downloader\ProgressUpdatedEventArgs.cs" />
     <Compile Include="Models\Downloader\Range.cs" />
     <Compile Include="Models\Downloader\SpeedUpdatedEventArgs.cs" />
@@ -100,11 +109,17 @@
     <Compile Include="DependencyInjection\DependencyResolver.cs" />
     <Compile Include="DependencyInjection\IDependencyResolver.cs" />
     <Compile Include="Services\Implementations\YouTubeVideoInfoExtractor.cs" />
+    <Compile Include="ViewModels\AllConvertingViewModel.cs" />
     <Compile Include="ViewModels\AllDownloadsViewModel.cs" />
+    <Compile Include="ViewModels\ConvertViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\DownloadViewModel.cs" />
     <Compile Include="Views\AllDownloadsView.xaml.cs">
       <DependentUpon>AllDownloadsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConvertingView.xaml.cs">
+      <DependentUpon>ConvertingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DownloadView.xaml.cs">
       <DependentUpon>DownloadView.xaml</DependentUpon>
@@ -126,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AllDownloadsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ConvertingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -162,7 +181,19 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="sharploadericon_OxC_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FFMPEG\FFMPEG.csproj">
+      <Project>{3c985b0e-ee59-4649-a823-3c356beecc5e}</Project>
+      <Name>FFMPEG</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SharpLoader.Utils\SharpLoader.Utils.csproj">
+      <Project>{8d494558-eba4-4861-97af-cd4e2a233552}</Project>
+      <Name>SharpLoader.Utils</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,4 +1,6 @@
-﻿using SharpLoader.Helpers;
+﻿using FFMPEG.Implementations;
+using FFMPEG.Interfaces;
+using SharpLoader.Helpers;
 using SharpLoader.Services.Contracts;
 using SharpLoader.Services.Implementations;
 
@@ -24,6 +26,7 @@ namespace SharpLoader.DependencyInjection
             DependencyResolver.Instance.RegisterType<INotificationService, NotificationService>();
             DependencyResolver.Instance.RegisterType<IHtmlDownloader, HtmlDownloader>();
             DependencyResolver.Instance.RegisterType<IHtmlParser, HtmlParser>();
+            DependencyResolver.Instance.RegisterType<IFfmpegEncoder, FfmpegEncoder>();
         }
     }
 }

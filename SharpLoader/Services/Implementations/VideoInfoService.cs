@@ -27,11 +27,11 @@ namespace SharpLoader.Services.Implementations
             urlService = DependencyResolver.Instance.Resolve<IUrlService>();
         }
 
-        public async Task<VideoInfo> GetVideoInfo(string videoUrl)
+        public VideoInfo GetVideoInfo(string videoUrl)
         {
             var domain = urlService.GetDomainFromUrl(videoUrl);
             var videoInfoStrategy = VideoInfoExtractors[domain];
-            var videoInfo = await videoInfoStrategy.GetVideoInfo(videoUrl);
+            var videoInfo = videoInfoStrategy.GetVideoInfo(videoUrl);
             return  videoInfo;
         }
     }

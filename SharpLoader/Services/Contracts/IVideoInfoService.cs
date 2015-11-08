@@ -5,6 +5,6 @@ namespace SharpLoader.Services.Contracts
 {
     public interface IVideoInfoService
     {
-        Task<VideoInfo> GetVideoInfo(string videoUrl);
+        VideoInfo GetVideoInfo(string videoUrl);
     }
 }

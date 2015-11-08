@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using SharpLoader.Commands;
-using SharpLoader.Models;
+using FFMPEG.Interfaces;
 using SharpLoader.Models.Downloader;
-using SharpLoader.Services;
 using SharpLoader.DependencyInjection;
 using SharpLoader.Models.Video;
 using SharpLoader.Services.Contracts;
+using SharpLoader.Utils;
 
 namespace SharpLoader.ViewModels
 {
     public class DownloadViewModel : ViewModelBase
     {
+        public event EventHandler<DownloadFinishedEventArgs> DownloadFinished;
+
         private long progress;
         private BitmapImage thumbnail;
         private string speed;
@@ -29,7 +27,7 @@ namespace SharpLoader.ViewModels
             set
             {
                 title = value;
-                OnPropertyChanged("Title");
+                OnPropertyChanged(nameof(Title));
             }
         }
 
@@ -42,7 +40,7 @@ namespace SharpLoader.ViewModels
             set
             {
                 progress = value;
-                OnPropertyChanged("Progress");
+                OnPropertyChanged(nameof(Progress));
             }
         }
 
@@ -55,7 +53,7 @@ namespace SharpLoader.ViewModels
             set
             {
                 thumbnail = value;
-                OnPropertyChanged("Thumbnail");
+                OnPropertyChanged(nameof(Thumbnail));
             }
         }
 
@@ -65,7 +63,7 @@ namespace SharpLoader.ViewModels
             set
             {
                 duration = value;
-                OnPropertyChanged("Duration");
+                OnPropertyChanged(nameof(Duration));
             }
         }
 
@@ -78,7 +76,7 @@ namespace SharpLoader.ViewModels
             set
             {
                 speed = string.Format("{0} MB/s", value);
-                OnPropertyChanged("Speed");
+                OnPropertyChanged(nameof(Speed));
             }
         }
 
@@ -94,11 +92,19 @@ namespace SharpLoader.ViewModels
 
             downloaderService.ProgressUpdated += OnDownloaderProgressUpdated;
             downloaderService.SpeedUpdated += OnSpeedUpdated;
+            downloaderService.DownloadFinished += RaiseDownloadFinished;
+             
         }
 
-        public async Task<VideoInfo> Initialize(string videoUrl)
+        private void RaiseDownloadFinished(object sender, DownloadFinishedEventArgs e)
         {
-            var videoInfo = await videoInfoService.GetVideoInfo(videoUrl);
+            EventUtils.RaiseEvent(this, e, ref DownloadFinished);
+            //ffmpegEncoder.EncodeToAvi(e.DownloadFileName, e.DownloadFileName);
+        }
+
+        public VideoInfo Initialize(string videoUrl)
+        {
+            var videoInfo = videoInfoService.GetVideoInfo(videoUrl);
             Thumbnail = videoInfo.Thumbnail;
             Title = videoInfo.Title;
             Duration = TimeSpan.FromSeconds(videoInfo.DurationInSeconds).ToString();
