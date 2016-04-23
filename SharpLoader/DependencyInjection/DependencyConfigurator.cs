@@ -27,6 +27,7 @@ namespace SharpLoader.DependencyInjection
             DependencyResolver.Instance.RegisterType<IHtmlDownloader, HtmlDownloader>();
             DependencyResolver.Instance.RegisterType<IHtmlParser, HtmlParser>();
             DependencyResolver.Instance.RegisterType<IFfmpegEncoder, FfmpegEncoder>();
+            DependencyResolver.Instance.RegisterType<IYoutubePlaylistLinksService, YoutubePlaylistLinksService>();
         }
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml;
 using Newtonsoft.Json;
@@ -48,14 +49,17 @@ namespace SharpLoader.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IUrlService _urlService;
         private readonly INotificationService _notificationService;
+        private readonly IYoutubePlaylistLinksService _playlistLinksService;
 
         public AllDownloadsViewModel(IDialogService dialogService,
             IUrlService urlService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IYoutubePlaylistLinksService playlistLinksService)
         {
             _dialogService = dialogService;
             _urlService = urlService;
             _notificationService = notificationService;
+            _playlistLinksService = playlistLinksService;
             Downloads = new ObservableCollection<DownloadViewModel>();
 
             BeginDownload = new CommandWithParameter<string>(InitializeDownload, CanInitializeDownload);
@@ -69,18 +73,12 @@ namespace SharpLoader.ViewModels
         {
             if (IsPlayList(url))
             {
-                BackgroundWorker worker = new BackgroundWorker();
-                worker.DoWork += (sender, args) =>
-                {
-
-                    var videoUrl = args.Argument.ToString();
-                    DownloadPlaylist(videoUrl);
-
-                };
-                worker.RunWorkerAsync(url);
-                return;
+                DownloadPlaylist(url);
             }
-            DownloadSingleVideo(url);
+            else
+            {
+                DownloadSingleVideo(url);
+            }
         }
 
 
@@ -110,42 +108,17 @@ namespace SharpLoader.ViewModels
 
         private void DownloadPlaylist(string playlistUrl)
         {
-            using (var client = new WebClient())
+            var playlistUrls = _playlistLinksService.ExtractPlaylistLinks(playlistUrl);
+            var downloadLocation = _dialogService.ShowChooseDirectoryDialog();
+            foreach (var url in playlistUrls)
             {
-                Playlist playlist;
-                var nextPageToken = string.Empty;
-                do
+                Task.Run(() =>
                 {
-                    var listId = Regex.Match(playlistUrl, @"\w+&list=(?<listId>.+)[&.]*").Groups["listId"].Value;
-                    var url =
-                        $"https://content.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&pageToken={nextPageToken}&playlistId={listId}&key=AIzaSyCFj15TpkchL4OUhLD1Q2zgxQnMb7v3XaM";
-                    client.Headers["X-Origin"] = "https://developers.google.com";
-                    var json = client.DownloadString(url);
-                    playlist = JsonConvert.DeserializeObject<Playlist>(json);
-                    nextPageToken = playlist.NextPageToken;
-                    var directory = _dialogService.ShowChooseDirectoryDialog();
-                    Parallel.ForEach(playlist.Items, (item) =>
-                    {
-                        var videoUrl = $"https://www.youtube.com/watch?v={item.ContentDetails.VideoId}";
-                        if (!ValidateUrl(videoUrl))
-                        {
-                            return;
-                        }
-
-
-                        var downloader1 = new DownloadViewModel();
-                        downloader1.DownloadFinished += RaiseDownloadFinished;
-                        var videoInfo1 = downloader1.Initialize(videoUrl);
-
-                        bool? result1 = false;
-
-                        App.Current.Dispatcher.Invoke(() =>
-                        {
-                            Downloads.Add(downloader1);
-                        });
-                        downloader1.Download(videoInfo1, Path.Combine(directory, videoInfo1.FileName));
-                    });
-                } while (!string.IsNullOrEmpty(playlist.NextPageToken));
+                    var downloader = new DownloadViewModel();
+                    App.Current.Dispatcher.Invoke(() => Downloads.Add(downloader));
+                    var videoInfo = downloader.Initialize(url);
+                    downloader.Download(videoInfo, downloadLocation + "\\" + videoInfo.FileName);
+                });
             }
         }
 

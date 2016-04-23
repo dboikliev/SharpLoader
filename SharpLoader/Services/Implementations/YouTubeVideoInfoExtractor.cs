@@ -154,13 +154,6 @@ namespace SharpLoader.Services.Implementations
 
         private string DecipherSignature(string signature)
         {
-            //Mr.ZW(a, 7);
-            //Mr.hr(a, 18);
-            //Mr.ZW(a, 13);
-            //Mr.ZW(a, 69);
-            //Mr.wr(a, 3);
-            //Mr.hr(a, 28);
-            //Mr.ZW(a, 14);
             var signatureChars = signature.ToCharArray();
             signatureChars = SwapSigunatureCharacters(signatureChars, 7);
             Array.Reverse(signatureChars);
@@ -169,14 +162,6 @@ namespace SharpLoader.Services.Implementations
             signatureChars = Slice(signatureChars, 3);
             Array.Reverse(signatureChars);
             signatureChars = SwapSigunatureCharacters(signatureChars, 14);
-            //signatureChars = Slice(signatureChars, 3);
-            //signatureChars = SwapSigunatureCharacters(signatureChars, 53);
-            //signatureChars = SwapSigunatureCharacters(signatureChars, 11);
-            //signatureChars = Slice(signatureChars, 3);
-            //Array.Reverse(signatureChars);
-            //signatureChars = Slice(signatureChars, 3);
-            //signatureChars = SwapSigunatureCharacters(signatureChars, 16);
-            //Array.Reverse(signatureChars);
             var decipheredSignature = string.Concat(signatureChars);
             return decipheredSignature;
         }

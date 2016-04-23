@@ -40,6 +40,10 @@
     <ApplicationIcon>sharploadericon_OxC_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Practices.Unity">
       <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
@@ -101,8 +105,10 @@
     <Compile Include="Services\Contracts\INotificationService.cs" />
     <Compile Include="Services\Contracts\IUrlService.cs" />
     <Compile Include="Services\Contracts\IVideoInfoService.cs" />
+    <Compile Include="Services\Contracts\IYoutubePlaylistLinksService.cs" />
     <Compile Include="Services\Implementations\DialogService.cs" />
     <Compile Include="Services\Implementations\DownloaderService.cs" />
+    <Compile Include="Services\Implementations\YoutubePlaylistLinksService.cs" />
     <Compile Include="Services\Implementations\NotificationService.cs" />
     <Compile Include="Services\Implementations\UrlService.cs" />
     <Compile Include="Services\Implementations\Vbox7VideoInfoService.cs" />
