@@ -31,7 +31,7 @@
                           ScrollViewer.CanContentScroll="False"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"  
                           HorizontalContentAlignment="Stretch" 
-                          BorderThickness="5"
+                          BorderThickness="0"
                           ItemsSource="{Binding Downloads}">
                     <ListView.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:DownloadViewModel}">
