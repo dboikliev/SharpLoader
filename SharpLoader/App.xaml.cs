@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Net;
+using System.Windows;
 
 namespace SharpLoader
 {
@@ -10,6 +11,7 @@ namespace SharpLoader
         protected override void OnStartup(StartupEventArgs e)
         {
             DependencyInjection.DependencyConfigurator.Instance.InitializeContainer();
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
             base.OnStartup(e);
         }
     }

@@ -16,13 +16,6 @@ namespace SharpLoader.Services.Implementations
 {
     public class YouTubeVideoInfoService : IVideoInfoService
     {
-        private readonly IHtmlDownloader _htmlDownloader;
-
-        public YouTubeVideoInfoService()
-        {
-            _htmlDownloader = DependencyResolver.Instance.Resolve<IHtmlDownloader>();
-        }
-
         public VideoInfo GetVideoInfo(string videoUrl)
         {
             var videoId = ExtractVideoId(videoUrl);
@@ -103,11 +96,7 @@ namespace SharpLoader.Services.Implementations
         {
             using (var webClient = new WebClient())
             {
-
                 var metadataUrl = $"http://www.youtube.com/get_video_info?video_id={videoId}&el=detailpage";
-
-                //webClient.Headers["Cookie"] =
-                //    "GEUP=e518689d4c480e82d730e6c78c768a7faQwAAAA=; _ga=GA1.2.171862194.1434138653; gmOGQ.resume=FMoZKfx1dcw:346,GBIZfnaVc5M:1333,9D1M7QeteKU:266,55uTkKr7Cxc:1171; VISITOR_INFO1_LIVE=pOCPy7RkY6s; s_gl=1d69aac621b2f9c0a25dade722d6e24bcwIAAABVUw==; YSC=GuEy-_U0sWQ; SID=DQAAABEBAACuGaalsZyc6ufDVHFAl9Dp9guxEjpJWSLdHh0jZv5PNniuZowvfjYni68EuBtEtAG7yAs0rCcCBkZ7gE6t7ppnNWmjrPi_RayofDNqv265xjJAxQYVxoPQ4Xzt10AEQS7ER9tytIfVuVG5qwMJAqrzZK27ygTDhBkEnehCcoxyHYfv0BaTVXXyL3gv-xyIV8oEN-MOQY7OQsZRKRsFjdXPqJ_OgCbWE0gYhPQT9iLBbq1-5NkXvX5NqU8f4OrAOmh06ilFEGYShFgQTtbEagJ-xk4Kpx77aNT8oB2LJE9s2842ugDpTbTFBBiraZBVOrGw8aZr2jcr1D_lAAuhSpb9t2CMQ-gXfu6tMerdMMhbASJ-Y91_QWwynbT1Ph_gK-M; HSID=AtBh8s0AdWhjBQjpW; APISID=Qq1D-Fv_sPFbsh_Z/A3sbOQdS0sEtLzKTl; CONSENT=YES+BG.en-GB+20150628-20-0; LOGIN_INFO=6401b5bc311185a417d6b9b81726f270c1oAAAB7IjEwIjogNDYzODkzMTQ2MDM0LCAiOCI6IDkxMjI0MzIzMjkyNSwgIjciOiAwLCAiNCI6ICJERUxFR0FURUQiLCAiMyI6IDEwMzY5Mjg2MjIsICIxIjogMX0=; PREF=f5=20030030&al=bg&f1=50000000&f4=20000";
                 var metadata = webClient.DownloadString(metadataUrl);
                 if (metadata.Contains("fail"))
                 {
@@ -153,13 +142,13 @@ namespace SharpLoader.Services.Implementations
         private string DecipherSignature(string signature)
         {
             var signatureChars = signature.ToCharArray();
-            signatureChars = SwapSigunatureCharacters(signatureChars, 7);
+            signatureChars = SwapSignatureCharacters(signatureChars, 7);
             Array.Reverse(signatureChars);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 13);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 69);
+            signatureChars = SwapSignatureCharacters(signatureChars, 13);
+            signatureChars = SwapSignatureCharacters(signatureChars, 69);
             signatureChars = Slice(signatureChars, 3);
             Array.Reverse(signatureChars);
-            signatureChars = SwapSigunatureCharacters(signatureChars, 14);
+            signatureChars = SwapSignatureCharacters(signatureChars, 14);
             var decipheredSignature = string.Concat(signatureChars);
             return decipheredSignature;
         }
@@ -169,7 +158,7 @@ namespace SharpLoader.Services.Implementations
             return characters.Skip(position).Take(characters.Length).ToArray();
         }
 
-        private char[] SwapSigunatureCharacters(char[] signatureCharacters, int position)
+        private char[] SwapSignatureCharacters(char[] signatureCharacters, int position)
         {
             var charToMove = signatureCharacters[0];
             signatureCharacters[0] = signatureCharacters[position % signatureCharacters.Length];
@@ -180,9 +169,11 @@ namespace SharpLoader.Services.Implementations
         private long GetVideoSizeInBytes(string downloadUrl)
         {
             var request = (HttpWebRequest)WebRequest.Create(downloadUrl);
-            var response = (HttpWebResponse)request.GetResponse();
-            var contentLength = response.ContentLength;
-            return contentLength;
+            using (var response = (HttpWebResponse) request.GetResponse())
+            {
+                var contentLength = response.ContentLength;
+                return contentLength;
+            }
         }
 
         private string ExtractVideoId(string videoUrl)

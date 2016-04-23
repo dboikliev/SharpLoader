@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace SharpLoader.Commands
 {
-    class Command : ICommand
+    public class Command : ICommand
     {
         private readonly Action _execute;
         private readonly Func<bool> _canExecute;
@@ -16,23 +16,14 @@ namespace SharpLoader.Commands
 
         public bool CanExecute(object parameter)
         {
-            if (_canExecute == null)
-            {
-                return true;
-            }
-            return _canExecute();
+            var canExecute = _canExecute?.Invoke() ?? true;
+            return canExecute;
         }
 
         public event EventHandler CanExecuteChanged
         {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-            }
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-            }
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
         }
 
         public void Execute(object parameter)

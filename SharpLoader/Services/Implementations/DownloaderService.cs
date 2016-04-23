@@ -59,8 +59,7 @@ namespace SharpLoader.Services.Implementations
 
         private void CreateCleanFile(string downloadLocation)
         {
-            var stream = File.Create(downloadLocation);
-            stream.Dispose();
+            using (File.Create(downloadLocation)) { }
         }
 
         private void DownloadRange(string videoUrl, string downloadLocation, Range segment)
@@ -69,23 +68,15 @@ namespace SharpLoader.Services.Implementations
             request.AddRange(segment.Start, segment.End);
 
             using (var response = (HttpWebResponse)request.GetResponse())
-            using (var stream = response.GetResponseStream())
+            using (var webStream = response.GetResponseStream())
             using (var fileStream = File.Open(downloadLocation, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 fileStream.Position = segment.Start;
-                using (var reader = new BinaryReader(stream))
-                {
-                    var data = reader.ReadBytes((int)segment.Length);
-
-                    _totalDownloadedBytes += data.Length;
-                    UpdateProgress();
-
-                    using (var writer = new BinaryWriter(fileStream))
-                    {
-                        writer.Write(data);
-                        _bytesDownloadedPerSecond += data.Length;
-                    }
-                }
+                webStream?.CopyTo(fileStream);
+                var bytesWritten = fileStream.Position - segment.Start;
+                _totalDownloadedBytes += bytesWritten;
+                _bytesDownloadedPerSecond += bytesWritten;
+                UpdateProgress();
             }
         }
 
@@ -101,7 +92,7 @@ namespace SharpLoader.Services.Implementations
         {
             var progressArgs = new ProgressUpdatedEventArgs
             {
-                Progress = (int) (100.0 * _totalDownloadedBytes / _currentVideoSize)
+                Progress = (int)(100.0 * _totalDownloadedBytes / _currentVideoSize)
             };
             EventUtils.RaiseEvent(this, progressArgs, ref ProgressUpdated);
         }

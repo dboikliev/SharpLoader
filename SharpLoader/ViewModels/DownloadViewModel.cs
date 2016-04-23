@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Windows.Media.Imaging;
 using SharpLoader.Models.Downloader;
 using SharpLoader.DependencyInjection;
@@ -83,8 +82,6 @@ namespace SharpLoader.ViewModels
 
         public DownloadViewModel()
         {
-            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
-
             _videoInfoService = DependencyResolver.Instance.Resolve<IVideoInfoService>();
             _downloaderService = DependencyResolver.Instance.Resolve<IDownloaderService>();
 

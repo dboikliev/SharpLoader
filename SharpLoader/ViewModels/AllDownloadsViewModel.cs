@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Newtonsoft.Json;
 using SharpLoader.Commands;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Services.Contracts;
@@ -11,30 +10,9 @@ using SharpLoader.Utils;
 
 namespace SharpLoader.ViewModels
 {
-    class Playlist
-    {
-        [JsonProperty("items")]
-        public Item[] Items { get; set; }
-        [JsonProperty("nextPageToken")]
-        public string NextPageToken { get; set; }
-    }
-
-    class Item
-    {
-        [JsonProperty("contentDetails")]
-        public ContentDetails ContentDetails { get; set; }
-    }
-
-    class ContentDetails
-    {
-        [JsonProperty("videoId")]
-        public string VideoId { get; set; }
-    }
-
-
     public class AllDownloadsViewModel : ViewModelBase
     {
-        public ObservableCollection<DownloadViewModel> Downloads { get; }
+        public ObservableCollection<DownloadViewModel> Downloads { get; } = new ObservableCollection<DownloadViewModel>();
 
         public event EventHandler<DownloadFinishedEventArgs> DownloadFinished;
 
@@ -54,13 +32,8 @@ namespace SharpLoader.ViewModels
             _urlService = urlService;
             _notificationService = notificationService;
             _playlistLinksService = playlistLinksService;
-            Downloads = new ObservableCollection<DownloadViewModel>();
 
             BeginDownload = new CommandWithParameter<string>(InitializeDownload, CanInitializeDownload);
-
-            //_dialogService = DependencyResolver.Instance.Resolve<IDialogService>();
-            //_urlService = DependencyResolver.Instance.Resolve<IUrlService>();
-            //_notificationService = DependencyResolver.Instance.Resolve<INotificationService>();
         }
 
         private void InitializeDownload(string url)
@@ -135,7 +108,7 @@ namespace SharpLoader.ViewModels
         {
             if (!_urlService.IsValidUrl(videoUrl))
             {
-                _notificationService.ShowErrorNotification(string.Format("{0} is not a valid url.", videoUrl));
+                _notificationService.ShowErrorNotification($"{videoUrl} is not a valid url.");
                 return false;
             }
             return true;
