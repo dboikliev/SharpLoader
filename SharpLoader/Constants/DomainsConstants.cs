@@ -4,5 +4,6 @@
     {
         public const string Vbox7 = "vbox7.com";
         public const string YouTube = "youtube.com";
+        public const string HttpsYouTube = "https://www.youtube.com";
     }
 }

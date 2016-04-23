@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
-using System.Web.Management;
 using System.Windows.Media.Imaging;
 using SharpLoader.DependencyInjection;
 using SharpLoader.Helpers;
@@ -18,11 +16,11 @@ namespace SharpLoader.Services.Implementations
 {
     public class YouTubeVideoInfoService : IVideoInfoService
     {
-        private readonly IHtmlDownloader htmlDownloader;
+        private readonly IHtmlDownloader _htmlDownloader;
 
         public YouTubeVideoInfoService()
         {
-            htmlDownloader = DependencyResolver.Instance.Resolve<IHtmlDownloader>();
+            _htmlDownloader = DependencyResolver.Instance.Resolve<IHtmlDownloader>();
         }
 
         public VideoInfo GetVideoInfo(string videoUrl)

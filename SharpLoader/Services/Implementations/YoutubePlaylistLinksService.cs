@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
+using SharpLoader.Constants;
 using SharpLoader.Services.Contracts;
 
 namespace SharpLoader.Services.Implementations
@@ -20,11 +17,10 @@ namespace SharpLoader.Services.Implementations
             var urls = links
                 .Select(link =>
                 {
-                    var prefix = "https://www.youtube.com";
-
-                    var decodedUrl = HttpUtility.UrlDecode(link.GetAttributeValue("href", string.Empty));
-                    decodedUrl = decodedUrl?.Substring(0, decodedUrl.IndexOf("&")) ?? string.Empty;
-                    return prefix + decodedUrl;
+                    var decodedUrl = HttpUtility.UrlDecode(link.GetAttributeValue("href", string.Empty)) ?? string.Empty;
+                    var indexOfSecondParameter = decodedUrl.IndexOf("&", StringComparison.Ordinal);
+                    decodedUrl = decodedUrl.Substring(0, indexOfSecondParameter);
+                    return DomainsConstants.HttpsYouTube + decodedUrl;
                 })
                 .Distinct()
                 .ToArray();

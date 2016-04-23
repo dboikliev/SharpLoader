@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using FFMPEG.Interfaces;
 using SharpLoader.DependencyInjection;
 
@@ -12,22 +7,22 @@ namespace SharpLoader.ViewModels
     public class ConvertViewModel : ViewModelBase
     {
 
-        private readonly IFfmpegEncoder ffmpegEncoder;
+        private readonly IFfmpegEncoder _ffmpegEncoder;
 
 
 
-        private long progress;
-        private BitmapImage thumbnail;
-        private string speed;
-        private string title;
-        private string duration;
+        private long _progress;
+        private BitmapImage _thumbnail;
+        private string _speed;
+        private string _title;
+        private string _duration;
 
         public string Title
         {
-            get { return title; }
+            get { return _title; }
             set
             {
-                title = value;
+                _title = value;
                 OnPropertyChanged(nameof(Title));
             }
         }
@@ -36,11 +31,11 @@ namespace SharpLoader.ViewModels
         {
             get
             {
-                return progress;
+                return _progress;
             }
             set
             {
-                progress = value;
+                _progress = value;
                 OnPropertyChanged(nameof(Progress));
             }
         }
@@ -49,34 +44,34 @@ namespace SharpLoader.ViewModels
         {
             get
             {
-                return thumbnail;
+                return _thumbnail;
             }
             set
             {
-                thumbnail = value;
+                _thumbnail = value;
                 OnPropertyChanged(nameof(Thumbnail));
             }
         }
 
         public string Duration
         {
-            get { return duration; }
+            get { return _duration; }
             set
             {
-                duration = value;
+                _duration = value;
                 OnPropertyChanged(nameof(Duration));
             }
         }
 
         public ConvertViewModel()
         {
-            ffmpegEncoder = DependencyResolver.Instance.Resolve<IFfmpegEncoder>();
+            _ffmpegEncoder = DependencyResolver.Instance.Resolve<IFfmpegEncoder>();
         }
 
         public async void Convert(string fileName, string resultFileName)
         {
-            ffmpegEncoder.ProgressUpdated += OnProgressUpdated;
-            ffmpegEncoder.EncodeToAvi(fileName, resultFileName);
+            _ffmpegEncoder.ProgressUpdated += OnProgressUpdated;
+            _ffmpegEncoder.EncodeToAvi(fileName, resultFileName);
         }
 
         private void OnProgressUpdated(object sender, FFMPEG.Implementations.VideoEncodingEventArgs e)

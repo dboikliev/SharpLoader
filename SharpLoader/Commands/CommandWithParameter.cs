@@ -5,31 +5,31 @@ namespace SharpLoader.Commands
 {
     public class CommandWithParameter<T> : ICommand
     {
-        private readonly Action<T> execute;
-        private readonly Predicate<T> canExecute;
+        private readonly Action<T> _execute;
+        private readonly Predicate<T> _canExecute;
 
         public CommandWithParameter(Action<T> execute, Predicate<T> canExecute)
         {
-            this.execute = execute;
-            this.canExecute = canExecute;
+            _execute = execute;
+            _canExecute = canExecute;
         }
 
         public bool CanExecute(T parameter)
         {
-            if (canExecute == null)
+            if (_canExecute == null)
             {
                 return true;
             }
-            return canExecute(parameter);
+            return _canExecute(parameter);
         }
 
         bool ICommand.CanExecute(object parameter)
         {
-            if (canExecute == null)
+            if (_canExecute == null)
             {
                 return true;
             }
-            return canExecute((T)parameter);
+            return _canExecute((T)parameter);
         }
 
         public event EventHandler CanExecuteChanged
@@ -46,12 +46,12 @@ namespace SharpLoader.Commands
 
         public void Execute(T parameter)
         {
-            execute(parameter);
+            _execute(parameter);
         }
 
         void ICommand.Execute(object parameter)
         {
-            execute((T)parameter);
+            _execute((T)parameter);
         }
     }
 }

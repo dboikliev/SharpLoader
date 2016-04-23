@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using SharpLoader.Constants;
 using SharpLoader.DependencyInjection;
 using SharpLoader.Models.Video;
@@ -20,16 +19,16 @@ namespace SharpLoader.Services.Implementations
             };
         }
 
-        private readonly IUrlService urlService;
+        private readonly IUrlService _urlService;
 
         public VideoInfoService()
         {
-            urlService = DependencyResolver.Instance.Resolve<IUrlService>();
+            _urlService = DependencyResolver.Instance.Resolve<IUrlService>();
         }
 
         public VideoInfo GetVideoInfo(string videoUrl)
         {
-            var domain = urlService.GetDomainFromUrl(videoUrl);
+            var domain = _urlService.GetDomainFromUrl(videoUrl);
             var videoInfoStrategy = VideoInfoExtractors[domain];
             var videoInfo = videoInfoStrategy.GetVideoInfo(videoUrl);
             return  videoInfo;

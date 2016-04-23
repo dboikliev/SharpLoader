@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,9 +16,9 @@ namespace SharpLoader.Services.Implementations
     /// </summary>
     public class DownloaderService : IDownloaderService
     {
-        private long totalDownloadedBytes;
-        private long currentVideoSize;
-        private long bytesDownloadedPerSecond;
+        private long _totalDownloadedBytes;
+        private long _currentVideoSize;
+        private long _bytesDownloadedPerSecond;
 
         public event EventHandler<ProgressUpdatedEventArgs> ProgressUpdated;
         public event EventHandler<SpeedUpdatedEventArgs> SpeedUpdated;
@@ -30,7 +29,7 @@ namespace SharpLoader.Services.Implementations
             Task.Factory.StartNew(() =>
             {
                 DownloadFile(videoInfo, downloadLocation);
-                bytesDownloadedPerSecond = 0;
+                _bytesDownloadedPerSecond = 0;
                 UpdateSpeed();
                 EventUtils.RaiseEvent(this, new DownloadFinishedEventArgs(downloadLocation), ref DownloadFinished);
             });
@@ -38,8 +37,8 @@ namespace SharpLoader.Services.Implementations
 
         private void DownloadFile(VideoInfo video, string downloadLocation)
         {
-            totalDownloadedBytes = 0;
-            currentVideoSize = video.FileSize;
+            _totalDownloadedBytes = 0;
+            _currentVideoSize = video.FileSize;
 
             const int millisecondsInSecond = 1000;
             const int dueTime = 0;
@@ -78,13 +77,13 @@ namespace SharpLoader.Services.Implementations
                 {
                     var data = reader.ReadBytes((int)segment.Length);
 
-                    totalDownloadedBytes += data.Length;
+                    _totalDownloadedBytes += data.Length;
                     UpdateProgress();
 
                     using (var writer = new BinaryWriter(fileStream))
                     {
                         writer.Write(data);
-                        bytesDownloadedPerSecond += data.Length;
+                        _bytesDownloadedPerSecond += data.Length;
                     }
                 }
             }
@@ -92,17 +91,17 @@ namespace SharpLoader.Services.Implementations
 
         private void UpdateSpeed()
         {
-            var megabytes = bytesDownloadedPerSecond / 1024.0 / 1024.0;
+            var megabytes = _bytesDownloadedPerSecond / 1024.0 / 1024.0;
             var speedArgs = new SpeedUpdatedEventArgs(megabytes);
             EventUtils.RaiseEvent(this, speedArgs, ref SpeedUpdated);
-            bytesDownloadedPerSecond = 0;
+            _bytesDownloadedPerSecond = 0;
         }
 
         private void UpdateProgress()
         {
             var progressArgs = new ProgressUpdatedEventArgs
             {
-                Progress = (int) (100.0 * totalDownloadedBytes / currentVideoSize)
+                Progress = (int) (100.0 * _totalDownloadedBytes / _currentVideoSize)
             };
             EventUtils.RaiseEvent(this, progressArgs, ref ProgressUpdated);
         }

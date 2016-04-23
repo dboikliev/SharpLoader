@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Models.Video;
 

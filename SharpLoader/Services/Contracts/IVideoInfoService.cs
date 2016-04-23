@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using SharpLoader.Models.Video;
+﻿using SharpLoader.Models.Video;
 
 namespace SharpLoader.Services.Contracts
 {

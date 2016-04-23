@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using SharpLoader.Models.Video;
 using SharpLoader.Services.Contracts;

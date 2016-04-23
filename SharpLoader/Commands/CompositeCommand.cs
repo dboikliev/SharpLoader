@@ -8,22 +8,22 @@ namespace SharpLoader.Commands
 {
     public class CompositeCommand : ICommand
     {
-        private readonly IEnumerable<ICommand> commands;
+        private readonly IEnumerable<ICommand> _commands;
 
         public CompositeCommand(params ICommand[] commands)
         {
-            this.commands = commands;
+            _commands = commands;
         }
 
         public bool CanExecute(object parameter)
         {
-            var canExecute = commands.All(command => command.CanExecute(parameter));
+            var canExecute = _commands.All(command => command.CanExecute(parameter));
             return canExecute;
         }
 
         public void Execute(object parameter)
         {
-            commands.ForEach(command => command.Execute(parameter));
+            _commands.ForEach(command => command.Execute(parameter));
         }
 
         public event EventHandler CanExecuteChanged

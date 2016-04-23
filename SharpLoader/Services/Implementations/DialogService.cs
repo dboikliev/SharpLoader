@@ -1,6 +1,6 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using SharpLoader.Services.Contracts;
+using Application = System.Windows.Application;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace SharpLoader.Services.Implementations
@@ -20,7 +20,7 @@ namespace SharpLoader.Services.Implementations
         public string ShowSaveFileDialog(string fileName, string defaultExtension, out bool? result)
         {
             bool? isSuccessful = false;
-            var res = App.Current.Dispatcher.Invoke(() =>
+            var res = Application.Current.Dispatcher.Invoke(() =>
             {
                 var dialog = new SaveFileDialog();
                 dialog.Filter = "Video File (*.mp4, *.avi, *.flv)|*.mp4;*.avi;*.flv";
@@ -36,7 +36,7 @@ namespace SharpLoader.Services.Implementations
 
         public string ShowChooseDirectoryDialog()
         {
-            var res = App.Current.Dispatcher.Invoke(() =>
+            var res = Application.Current.Dispatcher.Invoke(() =>
             {
                 var dialog = new FolderBrowserDialog();
                 dialog.ShowDialog();

@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Windows;
 using System.Windows.Input;
-using System.Xml;
 using Newtonsoft.Json;
 using SharpLoader.Commands;
-using SharpLoader.DependencyInjection;
 using SharpLoader.Models.Downloader;
 using SharpLoader.Services.Contracts;
 using SharpLoader.Utils;
@@ -115,7 +109,7 @@ namespace SharpLoader.ViewModels
                 Task.Run(() =>
                 {
                     var downloader = new DownloadViewModel();
-                    App.Current.Dispatcher.Invoke(() => Downloads.Add(downloader));
+                    Application.Current.Dispatcher.Invoke(() => Downloads.Add(downloader));
                     var videoInfo = downloader.Initialize(url);
                     downloader.Download(videoInfo, downloadLocation + "\\" + videoInfo.FileName);
                 });
