@@ -39,25 +39,30 @@ namespace SharpLoader.ViewModels
 
     public class AllDownloadsViewModel : ViewModelBase
     {
-        public ObservableCollection<DownloadViewModel> Downloads { get; private set; }
+        public ObservableCollection<DownloadViewModel> Downloads { get; }
 
         public event EventHandler<DownloadFinishedEventArgs> DownloadFinished;
 
         public ICommand BeginDownload { get; private set; }
 
-        private readonly IDialogService dialogService;
-        private readonly IUrlService urlService;
-        private readonly INotificationService notificationService;
+        private readonly IDialogService _dialogService;
+        private readonly IUrlService _urlService;
+        private readonly INotificationService _notificationService;
 
-        public AllDownloadsViewModel()
+        public AllDownloadsViewModel(IDialogService dialogService,
+            IUrlService urlService,
+            INotificationService notificationService)
         {
+            _dialogService = dialogService;
+            _urlService = urlService;
+            _notificationService = notificationService;
             Downloads = new ObservableCollection<DownloadViewModel>();
 
             BeginDownload = new CommandWithParameter<string>(InitializeDownload, CanInitializeDownload);
 
-            dialogService = DependencyResolver.Instance.Resolve<IDialogService>();
-            urlService = DependencyResolver.Instance.Resolve<IUrlService>();
-            notificationService = DependencyResolver.Instance.Resolve<INotificationService>();
+            //_dialogService = DependencyResolver.Instance.Resolve<IDialogService>();
+            //_urlService = DependencyResolver.Instance.Resolve<IUrlService>();
+            //_notificationService = DependencyResolver.Instance.Resolve<INotificationService>();
         }
 
         private void InitializeDownload(string url)
@@ -92,7 +97,7 @@ namespace SharpLoader.ViewModels
             var videoInfo = downloader.Initialize(videoUrl);
 
             bool? result = false;
-            var downloadLocation = dialogService.ShowSaveFileDialog(videoInfo.FileName, videoInfo.FileExtension,
+            var downloadLocation = _dialogService.ShowSaveFileDialog(videoInfo.FileName, videoInfo.FileExtension,
                 out result);
             if (!result.GetValueOrDefault() || !ValidateDownloadLocation(downloadLocation))
             {
@@ -118,7 +123,7 @@ namespace SharpLoader.ViewModels
                     var json = client.DownloadString(url);
                     playlist = JsonConvert.DeserializeObject<Playlist>(json);
                     nextPageToken = playlist.NextPageToken;
-                    var directory = dialogService.ShowChooseDirectoryDialog();
+                    var directory = _dialogService.ShowChooseDirectoryDialog();
                     Parallel.ForEach(playlist.Items, (item) =>
                     {
                         var videoUrl = $"https://www.youtube.com/watch?v={item.ContentDetails.VideoId}";
@@ -161,9 +166,9 @@ namespace SharpLoader.ViewModels
 
         private bool ValidateUrl(string videoUrl)
         {
-            if (!urlService.IsValidUrl(videoUrl))
+            if (!_urlService.IsValidUrl(videoUrl))
             {
-                notificationService.ShowErrorNotification(string.Format("{0} is not a valid url.", videoUrl));
+                _notificationService.ShowErrorNotification(string.Format("{0} is not a valid url.", videoUrl));
                 return false;
             }
             return true;
@@ -173,7 +178,7 @@ namespace SharpLoader.ViewModels
         {
             if (string.IsNullOrEmpty(downloadLocation))
             {
-                notificationService.ShowErrorNotification("Invalid download location.");
+                _notificationService.ShowErrorNotification("Invalid download location.");
                 return false;
             }
             return true;

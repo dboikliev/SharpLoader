@@ -99,7 +99,6 @@ namespace SharpLoader.ViewModels
         private void RaiseDownloadFinished(object sender, DownloadFinishedEventArgs e)
         {
             EventUtils.RaiseEvent(this, e, ref DownloadFinished);
-            //ffmpegEncoder.EncodeToAvi(e.DownloadFileName, e.DownloadFileName);
         }
 
         public VideoInfo Initialize(string videoUrl)

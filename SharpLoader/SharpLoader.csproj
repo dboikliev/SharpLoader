@@ -89,6 +89,7 @@
     <Compile Include="Helpers\HtmlParser.cs" />
     <Compile Include="Helpers\IHtmlDownloader.cs" />
     <Compile Include="Helpers\IHtmlParser.cs" />
+    <Compile Include="Helpers\ViewModelLocator.cs" />
     <Compile Include="Models\Downloader\DownloadFinishedEventArgs.cs" />
     <Compile Include="Models\Downloader\ProgressUpdatedEventArgs.cs" />
     <Compile Include="Models\Downloader\Range.cs" />
@@ -137,8 +138,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MainWindowResources.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AllDownloadsView.xaml">
       <SubType>Designer</SubType>
